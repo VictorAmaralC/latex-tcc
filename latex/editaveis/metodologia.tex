@@ -1,0 +1,96 @@
+\chapter[Metodologia]{Metodologia}
+\addcontentsline{toc}{chapter}{Metodologia}
+\label{chap:metodologia}
+
+A metodologia deste trabalho é estruturada em torno da necessidade crítica de preservar a privacidade dos dados em um cenário onde múltiplos dispositivos, como smartphones e tablets, participam de um processo de aprendizado de máquina. O problema central que o modelo de aprendizado federado busca resolver reside na exposição potencial de dados sensíveis quando centralizados em um único servidor para treinamento de modelos de IA. Em vez de enviar os dados dos dispositivos para um servidor central, onde poderiam ser acessados ou comprometidos, o aprendizado federado propõe um paradigma descentralizado no qual os dispositivos realizam o treinamento localmente, compartilhando apenas os parâmetros do modelo (como pesos e gradientes) com o servidor central. Esta abordagem permite que os dispositivos colaborem no desenvolvimento de um modelo global sem nunca expor os dados locais. 
+
+A estruturação do problema foi conduzida considerando-se um cenário prático, onde múltiplos dispositivos, cada um contendo dados não identicamente distribuídos (não-IID), contribuem para o treinamento de um modelo de classificação de imagens (utilizando o conjunto de dados MNIST como referência). Este cenário foi escolhido por refletir uma situação comum em aplicações reais, onde dados como registros de saúde, preferências de usuários ou informações financeiras são distribuídos entre dispositivos pessoais e não podem ser compartilhados diretamente por questões de privacidade e conformidade com regulamentos como o GDPR. Assim, a metodologia abrange a implementação de um modelo federado que deve ser capaz de aprender de maneira eficiente e precisa a partir de dados dispersos, preservando a privacidade, e enfrenta desafios como a heterogeneidade dos dispositivos, a variabilidade da conectividade de rede e a necessidade de garantir a convergência do modelo global. A escolha do aprendizado federado, mais especificamente do processo Federated Averaging (FedAvg), é justificada pela sua capacidade de operar eficientemente em ambientes com essas características, buscando balancear a necessidade de proteção dos dados com a performance do modelo treinado.
+
+\section{Implementação}
+\label{sec:implementacao}
+
+Nesta seção, detalhamos a implementação do modelo de aprendizado federado desenvolvido para preservar a privacidade dos dados, utilizando as bibliotecas TensorFlow e TensorFlow Federated (TFF). O modelo visa treinar uma rede neural convolucional (CNN) para a classificação de dígitos no conjunto de dados MNIST, distribuído entre vários clientes, de forma a manter os dados locais privados. A seguir, descrevemos o passo a passo da implementação, justificando as escolhas tecnológicas.
+
+\subsection{Criação do Modelo Keras}
+
+O primeiro passo na implementação foi a criação de um modelo de aprendizado profundo utilizando a API Keras, que é uma interface de alto nível para o TensorFlow. O modelo definido é uma rede neural convolucional (CNN), projetada para a classificação de imagens de dígitos manuscritos do conjunto de dados MNIST. A CNN foi escolhida devido à sua eficácia comprovada em tarefas de reconhecimento de imagem, onde as camadas convolucionais são capazes de extrair características relevantes das imagens, e as camadas densas finais realizam a classificação.
+
+O modelo é composto pelas seguintes camadas:
+
+\begin{itemize}
+
+    \item Camada de Entrada: Aceita imagens de 28x28 pixels com um canal (escala de cinza).
+    \item Camada Convolucional (Conv2D): Aplica 32 filtros de convolução 3x3 para extrair características das imagens, seguida de uma função de ativação ReLU, que introduz não-linearidade.
+    \item Camada de Pooling (MaxPooling2D): Reduz a dimensionalidade das características extraídas, mantendo as mais importantes, o que ajuda a diminuir o risco de overfitting.
+    \item Camada de Flatten: Converte a matriz de características em um vetor, preparando-o para as camadas densas.
+    \item Camada Densa (Dense): Contém 128 neurônios com ativação ReLU, que permite a modelagem de interações complexas entre as características extraídas.
+    \item Camada de Saída: Contém 10 neurônios com ativação softmax, correspondente às 10 classes de dígitos (0-9).
+\end{itemize}
+
+\subsection{Criação do Modelo Federado}
+
+Ao invés de treinar o modelo Keras centralmente, a implementação segue para a construção de um modelo federado, onde o treinamento ocorre localmente nos dispositivos dos clientes. Para isso, utilizamos o TensorFlow Federated (TFF), que facilita a implementação de algoritmos de aprendizado federado.
+
+O modelo federado é criado a partir do modelo Keras, utilizando a função \texttt{tff.learning.models.from\_keras\_model}. Nessa etapa, é crucial que o modelo não seja compilado, pois a compilação será gerida pelo TFF. A função \texttt{from\_keras\_model} converte o modelo Keras em um modelo TFF que pode ser usado no contexto de aprendizado federado. Especificamos a função de perda \texttt{SparseCategoricalCrossentropy}, adequada para tarefas de classificação com labels inteiros, e a métrica \texttt{SparseCategoricalAccuracy}, que mede a acurácia do modelo.
+
+\subsection{Construção do Processo Federado}
+
+O processo de aprendizado federado é construído utilizando o algoritmo de Federated Averaging (FedAvg), que é amplamente utilizado para aprendizado federado. O FedAvg combina os pesos dos modelos treinados localmente em cada cliente, agregando-os em um modelo global no servidor central. Esta abordagem permite que os dados permaneçam localmente nos dispositivos, preservando a privacidade.
+
+O processo federado é construído com a função \texttt{tff.learning.algorithms.build\_unweighted\_fed\_avg}, onde são definidos os otimizadores para os clientes e o servidor. Utilizamos o otimizador SGD (Stochastic Gradient Descent) para ambos, com taxas de aprendizado distintas: 0,02 para os clientes, garantindo um aprendizado gradual, e 1,0 para o servidor, permitindo uma rápida atualização do modelo global com as médias ponderadas.
+
+\subsection{Preparação dos Dados}
+
+A preparação dos dados é um passo crucial para garantir que o modelo possa ser treinado de forma federada. Primeiramente, carregamos o conjunto de dados MNIST e normalizamos as imagens, dividindo os valores dos pixels por 255 para que fiquem no intervalo {[}0, 1{]}. Em seguida, os dados são divididos em subconjuntos para simular os diferentes clientes no cenário federado.
+
+A função \texttt{create\_client\_data} distribui o conjunto de dados entre os clientes, criando subconjuntos de imagens e labels que serão usados por cada cliente. Cada subconjunto é convertido em um \texttt{tf.data.Dataset}, que é então processado pela função \texttt{preprocess}. Esta função expande as dimensões das imagens, normaliza os dados e os organiza em lotes para o treinamento, garantindo que cada cliente tenha acesso a dados suficientes para um treinamento significativo.
+
+\subsection{Treinamento do Modelo Federado}
+
+Finalmente, o modelo é treinado através do processo iterativo de FedAvg. Inicialmente, o estado do modelo é definido com a função \texttt{initialize}. Em cada rodada de treinamento, o estado do modelo é atualizado com base nos modelos treinados localmente por cada cliente, utilizando a função \texttt{iterative\_process.next}. O treinamento é repetido por várias rodadas, com os resultados de cada rodada sendo avaliados e exibidos, permitindo o monitoramento do desempenho do modelo global.
+
+Essa implementação demonstra como o aprendizado federado pode ser utilizado para treinar um modelo de classificação de imagens, preservando a privacidade dos dados dos clientes ao manter as informações localizadas em cada dispositivo. A utilização do TensorFlow Federated é essencial para gerenciar a complexidade do treinamento federado, automatizando a agregação de modelos e garantindo uma implementação eficiente e escalável.
+
+\section{Justificativa}
+
+A escolha do processo de \textbf{Federated Averaging (FedAvg)} foi baseada em sua eficácia e simplicidade para a implementação de aprendizado federado em cenários onde a privacidade dos dados é uma preocupação central. A seguir, discutiremos as razões específicas para a escolha do FedAvg, suas vantagens e desvantagens, e os modelos de treinamento tradicionais que poderiam ser utilizados para comparar a performance.
+
+\subsection{Razões para a Escolha do FedAvg}
+
+O \textbf{FedAvg} é amplamente reconhecido e utilizado como uma das abordagens mais eficientes para o aprendizado federado, especialmente em contextos onde os dados são distribuídos entre vários clientes (dispositivos) que possuem capacidade computacional limitada. Ele opera através da média ponderada dos pesos dos modelos treinados localmente em cada cliente. Algumas das principais razões para a escolha do FedAvg incluem:
+
+1. Simplicidade de Implementação: O FedAvg é relativamente fácil de implementar, tanto em termos de código quanto em infraestrutura. Ele não requer modificações complexas no modelo original e é compatível com a maioria dos modelos de aprendizado de máquina.
+
+2. Eficiência em Ambientes Heterogêneos: Em cenários onde os clientes possuem capacidades computacionais variadas e dados não IID (independentemente e identicamente distribuídos), o FedAvg tem se mostrado robusto e eficaz. Ele permite que cada cliente contribua de acordo com sua capacidade, o que é ideal para dispositivos com diferentes níveis de poder computacional e conectividade.
+
+3. Privacidade Preservada: Como o FedAvg realiza o treinamento localmente nos dispositivos dos clientes e apenas os pesos dos modelos (não os dados) são enviados para o servidor central, ele ajuda a preservar a privacidade dos dados.
+
+\subsection{Vantagens do FedAvg}
+
+1. Escalabilidade: FedAvg é altamente escalável, sendo capaz de lidar com milhares de dispositivos clientes. A abordagem distribuída minimiza a necessidade de centralização de dados, reduzindo os gargalos associados ao processamento em larga escala.
+
+2. Flexibilidade: FedAvg pode ser aplicado a uma ampla variedade de modelos de aprendizado de máquina, desde redes neurais profundas até modelos mais simples, tornando-o versátil em diferentes cenários de aplicação.
+
+3. Resiliência a Dados Não IID: Em muitos cenários do mundo real, os dados disponíveis em diferentes dispositivos não seguem uma distribuição IID. O FedAvg consegue lidar razoavelmente bem com essas discrepâncias.
+
+\subsection{Desvantagens do FedAvg}
+
+1. Convergência Mais Lenta: Devido à natureza distribuída e à variabilidade entre os dispositivos, a convergência do FedAvg pode ser mais lenta comparada a métodos centralizados, especialmente em casos onde os dados são altamente desbalanceados entre os clientes.
+
+2. Dependência de Conectividade: O FedAvg requer que os dispositivos clientes enviem periodicamente seus modelos atualizados ao servidor central. Em ambientes com conectividade de rede instável ou dispositivos com pouca energia, isso pode se tornar um desafio.
+
+3. Sobrecarga Computacional e de Comunicação: Embora o FedAvg minimize a necessidade de centralização de dados, ele ainda requer que os dispositivos locais realizem computações significativas e participem regularmente da comunicação com o servidor, o que pode ser oneroso para dispositivos de baixa potência.
+
+\subsection{Modelos de Treinamento Tradicionais para Comparação}
+
+Para avaliar a eficácia do FedAvg, ele pode ser comparado com os seguintes modelos de treinamento tradicionais:
+
+1. Treinamento Centralizado: Neste método, todos os dados são centralizados em um único servidor, e o modelo é treinado de forma global utilizando os dados agregados. Isso permite uma comparação direta em termos de precisão e tempo de convergência, mas sacrifica a privacidade e é propenso a gargalos de comunicação.
+
+2. Treinamento Descentralizado (Distributed Data-Parallel Training): Em vez de treinamento federado, onde os modelos são treinados localmente e combinados, o treinamento descentralizado divide os dados em diferentes nós (semelhante ao FedAvg), mas sincroniza os gradientes após cada atualização de minibatch. Exemplos incluem frameworks como Horovod e o uso de parâmetros sincronizados em PyTorch Distributed. Esse método pode fornecer insights sobre a diferença de performance entre o treinamento federado e métodos tradicionais de treinamento distribuído.
+
+3. Aprendizado em Rede de Dispositivos (Device-to-Device Learning): Uma abordagem onde dispositivos colaboram diretamente entre si sem um servidor central (também chamado de aprendizado cooperativo ou gossip learning). Esse método pode ser usado para comparar a eficácia da agregação centralizada versus a descentralizada, destacando o impacto da topologia da rede na performance do modelo.
+
+\section{Conclusão}
+
+A escolha do FedAvg para o aprendizado federado é justificada por sua simplicidade, eficiência em cenários heterogêneos, e sua capacidade de preservar a privacidade dos dados. No entanto, para uma análise completa, é crucial comparar sua performance com métodos tradicionais, como o treinamento centralizado e outras abordagens de aprendizado distribuído, considerando fatores como convergência, precisão, escalabilidade e preservação da privacidade. Essas comparações ajudarão a contextualizar os benefícios e limitações do FedAvg em diferentes cenários de aplicação.edAvg em diferentes cenários de aplicação.
