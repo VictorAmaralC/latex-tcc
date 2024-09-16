@@ -22,11 +22,11 @@ A definição contemporânea de aprendizado de máquina engloba uma diversidade 
 
 Algoritmos clássicos têm desempenhado um papel crucial no progresso notável alcançado em aplicações de inteligência artificial, alguns deles como o de Regressão Linear na previsão de tendências econômicas, Máquinas de Vetores de Suporte (SVM) para diagnósticos médicos para classificação de imagens, ajudando na detecção de câncer em imagens de ressonância magnética ou tomografia computadorizada, e Redes Neurais de Feedforward em sistemas de reconhecimento de fala. A robustez desses métodos reside na simplicidade conceitual e na interpretabilidade, sendo capazes de aprender padrões a partir de dados de treinamento para realizar tarefas específicas. A Regressão Linear, por exemplo, é amplamente utilizada em problemas de previsão, enquanto as SVMs têm se destacado em tarefas de classificação, e as Redes Neurais de Feedforward têm demonstrado eficácia em problemas complexos, proporcionando um entendimento mais profundo dos dados \cite{bishop2006pattern} \cite{russell2016artificial}.
 
- Um dos desafios inerentes é a capacidade de lidar com dados não lineares de forma eficiente. Enquanto métodos como SVM podem ser estendidos para incluir kernels não lineares, a complexidade computacional muitas vezes aumenta substancialmente. Além disso, a interpretabilidade pode diminuir à medida que a complexidade do modelo aumenta, tornando difícil compreender os processos subjacentes, especialmente em redes neurais profundas \cite{goh2017deep}.
+Um dos desafios inerentes é a capacidade de lidar com dados não lineares de forma eficiente. Enquanto métodos como SVM podem ser estendidos para incluir kernels não lineares, a complexidade computacional muitas vezes aumenta substancialmente. Além disso, a interpretabilidade pode diminuir à medida que a complexidade do modelo aumenta, tornando difícil compreender os processos subjacentes, especialmente em redes neurais profundas \cite{goh2017deep}.
 
- Quando se trata de privacidade de dados, esses algoritmos tradicionais enfrentam desafios significativos. A coleta centralizada de dados para treinamento pode comprometer a privacidade dos usuários, expondo informações sensíveis a potenciais violações de segurança. Métodos como a Regressão Logística podem ser vulneráveis a ataques de reengenharia, nos quais modelos treinados são explorados para recuperar dados originais \cite{fredrikson2014privacy}.
+Quando se trata de privacidade de dados, esses algoritmos tradicionais enfrentam desafios significativos. A coleta centralizada de dados para treinamento pode comprometer a privacidade dos usuários, expondo informações sensíveis a potenciais violações de segurança. Métodos como a Regressão Logística podem ser vulneráveis a ataques de reengenharia, nos quais modelos treinados são explorados para recuperar dados originais \cite{fredrikson2014privacy}.
 
- A constante busca por algoritmos mais eficientes e seguros destaca a importância de equilibrar os pontos fortes e fracos dessas abordagens tradicionais. À medida que avançamos, é crucial incorporar técnicas inovadoras, como o aprendizado federado e a privacidade diferencial, para superar os desafios relacionados à privacidade de dados e aprimorar a eficácia geral dos modelos de inteligência artificial.
+A constante busca por algoritmos mais eficientes e seguros destaca a importância de equilibrar os pontos fortes e fracos dessas abordagens tradicionais. À medida que avançamos, é crucial incorporar técnicas inovadoras, como o aprendizado federado e a privacidade diferencial, para superar os desafios relacionados à privacidade de dados e aprimorar a eficácia geral dos modelos de inteligência artificial.
 
 \section{Aprendizado Federado}
 \label{sec:federado}
@@ -45,7 +45,7 @@ No treinamento tradicional, os dados são reunidos em um servidor central, onde 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.50]{figuras/TraditionalCentralizedLearning.eps}
+    \includegraphics[scale=0.50]{figuras/teorica/TraditionalCentralizedLearning.eps}
     \caption{Modelo de Treinamento Centralizado.}
     \label{fig:TraditionalCentralizedLearning}
 \end{figure}
@@ -54,7 +54,7 @@ O Aprendizado Federado, por outro lado, propõe uma abordagem descentralizada e 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.50]{figuras/FederatedLearning.eps}
+    \includegraphics[scale=0.50]{figuras/teorica/FederatedLearning.eps}
     \caption{Modelo de Treinamento - Aprendizado Federado.}
     \label{fig:FederatedLearning}
 \end{figure}
@@ -76,8 +76,6 @@ Desenvolvida para proteger informações sensíveis durante o processamento de d
 No cenário do AF, a integração da Privacidade Diferencial é essencial para assegurar a confidencialidade dos dados contribuídos por dispositivos locais. O processo de treinamento federado envolve a colaboração de modelos locais em dispositivos distribuídos, mas a agregação dessas informações pode expor informações sensíveis. Ao aplicar mecanismos de DP durante a agregação, cada dispositivo contribui diferencialmente para o modelo global, mitigando riscos de divulgação de dados individuais\cite{abadi2016}.
 
 Para ilustrar a eficácia da Privacidade Diferencial no treinamento federado, consideremos o exemplo de um sistema de recomendação personalizada. Ao incorporar técnicas de DP na agregação de preferências locais dos usuários, o sistema pode aprender padrões de comportamento de forma coletiva sem expor escolhas individuais. Da mesma forma, em diagnósticos médicos distribuídos, a aplicação de DP assegura que os modelos federados aprendam com imagens sem revelar informações específicas de pacientes, promovendo avanços na pesquisa médica colaborativa\cite{shokri2015}.
-
-
 
 \subsection{Ataques e medidas de Segurança em Ambientes Descentralizados}
 

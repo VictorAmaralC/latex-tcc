@@ -14,7 +14,7 @@ Para melhor entendimento, foi dividido em seções a implementação do código 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{figuras/kerasModel.eps}
+    \includegraphics[scale=0.25]{figuras/desenvolvimento/kerasModel.eps}
     \caption{Criação do Modelo Keras.}
     \label{fig:kerasModel}
 \end{figure}
@@ -25,7 +25,7 @@ A criação do modelo Keras neste ponto é feita utilizando uma rede neural conv
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{figuras/federatedModel.eps}
+    \includegraphics[scale=0.25]{figuras/desenvolvimento/federatedModel.eps}
     \caption{Construção do modelo federado.}
     \label{fig:federatedModel}
 \end{figure}
@@ -36,7 +36,7 @@ O modelo federado é construído a partir do modelo Keras criado anteriormente, 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{figuras/federatedProccess.eps}
+    \includegraphics[scale=0.25]{figuras/desenvolvimento/federatedProccess.eps}
     \caption{Construção do Processo de Federado.}
     \label{fig:federatedProccess}
 \end{figure}
@@ -49,7 +49,7 @@ Para a otimização, foi escolhido o \textit{SGD} (Stochastic Gradient Descent) 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.2]{figuras/dataPreparation.eps}
+    \includegraphics[scale=0.2]{figuras/desenvolvimento/dataPreparation.eps}
     \caption{Preparação dos dados.}
     \label{fig:dataPreparation}
 \end{figure}
@@ -62,7 +62,7 @@ A função \texttt{create\_client\_data} é responsável por distribuir os dados
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{figuras/modelTraining.eps}
+    \includegraphics[scale=0.25]{figuras/desenvolvimento/modelTraining.eps}
     \caption{Treinamento do modelo federado.}
     \label{fig:modelTraining}
 \end{figure}
@@ -79,7 +79,7 @@ Para criar um modelo de treinamento centralizado, foi realizado um processo seme
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{figuras/kerasCentralized.eps}
+    \includegraphics[scale=0.25]{figuras/desenvolvimento/kerasCentralized.eps}
     \caption{Definição do Modelo Keras.}
     \label{fig:kerasCentralized}
 \end{figure}
@@ -90,7 +90,7 @@ Comparando com o modelo federado, a estrutura básica do modelo é a mesma, mas 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{figuras/dataPrepCentralized.eps}
+    \includegraphics[scale=0.25]{figuras/desenvolvimento/dataPrepCentralized.eps}
     \caption{Carregamento e Preparação dos Dados.}
     \label{fig:dataPrepCentralized}
 \end{figure}
@@ -101,7 +101,7 @@ Comparado ao modelo federado, o modelo centralizado lida com dados de forma mais
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{figuras/compileModelCentralized.eps}
+    \includegraphics[scale=0.25]{figuras/desenvolvimento/compileModelCentralized.eps}
     \caption{Criação e Compilação do Modelo Centralizado.}
     \label{fig:compileModelCentralized}
 \end{figure}
@@ -112,7 +112,7 @@ No modelo federado, a compilação não ocorre na função de criação do model
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{figuras/trainingCentralized.eps}
+    \includegraphics[scale=0.25]{figuras/desenvolvimento/trainingCentralized.eps}
     \caption{Treinamento do modelo Centralizado.}
     \label{fig:trainingCentralized}
 \end{figure}
@@ -123,7 +123,7 @@ No modelo federado, o treinamento é distribuído entre vários clientes e o pro
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{figuras/testCentralized.eps}
+    \includegraphics[scale=0.25]{figuras/desenvolvimento/testCentralized.eps}
     \caption{Avaliação do Modelo.}
     \label{fig:testCentralized}
 \end{figure}
@@ -170,7 +170,7 @@ A segunda parte dessa seção apresenta a implementação do modelo de treinamen
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.2]{figuras/CodeFederatedLearning.eps}
+    \includegraphics[scale=0.2]{figuras/desenvolvimento/CodeFederatedLearning.eps}
     \caption{Implementação do modelo de Aprendizado Federado.}
     \label{fig:CodeFederatedLearning}
 \end{figure}
@@ -179,7 +179,7 @@ A segunda parte dessa seção apresenta a implementação do modelo de treinamen
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.2]{figuras/centralizedModel.eps}
+    \includegraphics[scale=0.2]{figuras/desenvolvimento/centralizedModel.eps}
     \caption{Implementação do Modelo de Aprendizado Centralizado.}
     \label{fig:centralizedModel}
 \end{figure}
