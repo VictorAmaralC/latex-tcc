@@ -2,4 +2,70 @@
 \addcontentsline{toc}{chapter}{Conclusão}
 \label{chap:conclusao}
 
-\section{Considerações Finais}
+Esse capítulo possui como intenção apresentar as considerações finais sobre esse trabalho, considerando a solução desenvolvida e os retornos referentes à utilização da solução, além de retomar as questões e objetivos inicialmente especificados no Capítulo 1. Inicialmente, há um breve resumo sobre o \hyperref[sec:contexto]{Contexto Geral} definido para o trabalho e reflexões sobre o mesmo. Após isso, será exposto sobre o status atual do trabalho, retomando \hyperref[sec:questionamentos]{Questionamentos e Objetivos}. Há destaque ainda para as \hyperref[sec:contribuicoes]{Contribuições e Fragilidades} da solução apresentada.  Por fim, constam ideias para \hyperref[sec:trabalhos-futuros]{Trabalhos Futuros}, visando evoluções para a solução atual.
+
+\section{Contexto Geral}
+\label{sec:contexto}
+
+O avanço das tecnologias de aprendizado de máquina e inteligência artificial tem proporcionado grandes benefícios, mas também levantado questões sobre como os dados dos usuários são coletados, armazenados e utilizados. O aprendizado federado surge como proposta de solução, permitindo o treinamento de modelos de IA em um ambiente distribuído sem a necessidade de centralizar os dados. Este método não só garante que os dados permaneçam na origem, preservando a privacidade dos usuários, mas também melhora a eficácia dos modelos ao aproveitar a diversidade dos dados distribuídos. A motivação para explorar este tema reside na necessidade de encontrar um equilíbrio entre a inovação tecnológica e o respeito pela privacidade, um tema de relevância crescente na sociedade atual.
+
+Sabendo disso, surgiu o interesse de explorar o aprendizado federado em um contexto prático, com o objetivo de entender melhor suas vantagens e desafios, assim como as possíveis aplicações em cenários reais e discussões acerca da aplicabilidade do modelo e as propostas que ele carrega consigo. A solução desenvolvida foi testada em um cenário de classificação de imagens de dígitos manuscritos, utilizando o conjunto de dados MNIST. Os resultados obtidos foram promissores, demonstrando a viabilidade do aprendizado federado para a tarefa proposta.
+
+\section{Questionamentos e Objetivos}
+\label{sec:questionamentos}
+
+A seguir, são retomadas as questões inicialmente apresentadas no trabalho, assim como os objetivos específicos e geral especificados para serem cumpridos ao longo do projeto.
+
+\subsection{Questão de Pesquisa}
+
+Durante a confecção do projeto, comparamos o desempenho do modelo federado com modelos centralizados, como MLP e DNN, utilizando a base de dados MNIST. Os resultados demonstraram que o modelo federado conseguiu manter uma performance competitiva em termos de acurácia e perda, semelhante aos modelos centralizados, apesar de operar em um cenário descentralizado. 
+
+Além de seu desempenho, o aprendizado federado é particularmente eficaz em preservar a privacidade dos usuários. A privacidade é protegida de várias maneiras. Primeiramente, os dados nunca saem dos dispositivos dos usuários, o que minimiza o risco de vazamentos ou acessos não autorizados. Em segundo lugar, a agregação dos gradientes ao invés dos dados brutos dificulta a recuperação de informações pessoais individuais. Adicionalmente, técnicas de privacidade como a \textit{differential privacy} podem ser aplicadas para adicionar ruído às atualizações do modelo, tornando ainda mais difícil a inferência sobre dados específicos a partir dos gradientes.
+
+Nosso estudo confirmou que o aprendizado federado não só oferece uma alternativa viável e eficaz para o treinamento de IA em ambientes descentralizados, mas também é uma abordagem sólida para garantir a privacidade dos usuários. Isso demonstra que, embora o aprendizado federado enfrente desafios técnicos, ele oferece uma solução equilibrada entre performance e proteção de dados, alinhando-se com as crescentes demandas por privacidade e segurança na era digital.
+
+\subsection{Questão de Desenvolvimento}
+
+Um dos principais desafios na implementação prática do aprendizado federado é a eficiência computacional. A descentralização do treinamento implica que cada dispositivo cliente deve processar e treinar modelos localmente, o que pode ser oneroso em termos de recursos computacionais e energia. Em nosso projeto, observou-se que modelos mais complexos, como o DNN (Deep Neural Network), demandam significativamente mais tempo e recursos para treinamento comparado a modelos mais simples. Além disso, o processo de agregação de gradientes no servidor central requer um balanceamento cuidadoso entre a carga computacional distribuída e a capacidade do servidor de processar e combinar esses gradientes eficientemente. A combinação dessas demandas pode resultar em um tempo de treinamento mais longo e maior uso de recursos em comparação com métodos centralizados, onde o processamento é concentrado em um único servidor.
+
+Outro desafio crítico é a comunicação entre dispositivos. Em um ambiente federado, os dispositivos devem trocar informações sobre os gradientes ou atualizações do modelo com o servidor central em intervalos regulares. Isso pode ser problemático devido à largura de banda limitada e à latência da rede. No contexto do nosso estudo, foi observado que o treinamento federado em redes com largura de banda reduzida pode levar a um aumento no tempo total de treinamento e a uma menor eficiência na sincronização dos modelos. A necessidade de enviar atualizações frequentes e de alta frequência pode ser um gargalo significativo, especialmente em cenários com muitos clientes ou em redes de baixa qualidade.
+
+A adaptação a diferentes tipos de dados é outro desafio significativo. O AF assume que os dados distribuídos entre os clientes podem variar em termos de distribuição e qualidade. Em nosso projeto, lidamos com a base de dados MNIST, que é relativamente homogênea. No entanto, em cenários do mundo real, onde os dados podem ser altamente variados e desbalanceados, a eficácia do aprendizado federado pode ser comprometida. Isso pode levar a problemas como a convergência lenta do modelo e uma menor precisão geral, já que o modelo precisa ser capaz de generalizar bem sobre uma vasta gama de tipos e qualidades de dados. Estratégias para lidar com a heterogeneidade dos dados, como técnicas de personalização de modelos e ajuste de hiperparâmetros, são essenciais para superar essas limitações.
+
+Portanto, a questão de pesquisa revelou que, embora o aprendizado federado ofereça uma abordagem promissora para o treinamento descentralizado de modelos de IA, ele enfrenta desafios significativos relacionados à eficiência computacional, comunicação entre dispositivos e adaptação a diferentes tipos de dados. Superar essas dificuldades é crucial para a adoção mais ampla do AF em aplicações práticas, e futuras pesquisas e desenvolvimentos são necessários para otimizar essas áreas e melhorar a viabilidade e a eficácia da abordagem federada.
+
+\subsection{Objetivos Alcançados}
+
+Foram especificacados os seguintes objetivos para o projeto:
+
+\begin{itemize}
+    \item Objetivo específico 1: Conceituar Aprendizado federado e apontar as estratégias de aprendizado de máquina que podem ser usadas para preservação da privacidade dos usuários e de dados sensíveis. Status: Cumprido, apresentado no Capítulo 1.
+    \item Objetivo específico 2: Discorrer sobre técnicas de segurança e privacidade necessárias para proteger os dados dos usuários e o provedor do serviço durante o processo de treinamento. Status: Cumprido, apresentado no Capítulo 1.
+    \item Objetivo específico 3: Analisar o problema de uso de dados decentralizados, identificando os principais desafios. Status: Cumprido, apresentado no Capítulo 1, 5 e 6.
+    \item Objetivo específico 4: Comparar a eficácia do modelo de treinamento descentralizado quando comparado com modelos tradicionais de treinamento. Status: Cumprido, apresentado no Capítulo 5 e 6.
+\end{itemize}
+
+Atingindo-se os objetivos específicos, também é possível analisar o objetivo geral do trabalho, que era o investigar como o treinamento de IA's por meio do aprendizado federado pode ser efetivamente aplicado no contexto de dados descentralizados.
+
+\section{Contribuições e Fragilidades}
+\label{sec:contribuicoes}
+
+A comparação entre os modelos de aprendizado federado e os modelos centralizados (CNN, MLP e DNN) revelou não apenas a viabilidade do aprendizado federado, mas também suas vantagens em termos de preservação da privacidade dos dados dos usuários. O trabalho também contribuiu para a compreensão dos desafios específicos associados ao treinamento de modelos em um ambiente descentralizado, incluindo problemas de eficiência computacional e comunicação entre dispositivos. O desenvolvimento de um modelo federado que foi comparado com modelos centralizados permitiu avaliar as trade-offs entre privacidade e desempenho, oferecendo insights valiosos para futuras pesquisas e aplicações práticas.
+
+No entanto, o projeto também revelou algumas fragilidades que merecem consideração. Primeiramente, a eficiência computacional do aprendizado federado apresentou desafios notáveis. O tempo de treinamento do modelo federado foi consideravelmente maior em comparação com os modelos centralizados, evidenciando a necessidade de otimização dos processos de comunicação e agregação. A alta latência associada à comunicação entre dispositivos e a complexidade do algoritmo de agregação impactaram negativamente o desempenho do treinamento.
+
+Além disso, a heterogeneidade dos dados distribuídos apresentou um desafio adicional. A variabilidade nos dados dos clientes pode influenciar negativamente a performance do modelo federado, tornando-o menos eficaz em termos de generalização. Apesar dos avanços na técnica de federated averaging, a capacidade do modelo para lidar com diferentes tipos de dados ainda é limitada, o que pode comprometer a sua eficácia em cenários do mundo real.
+
+Finalmente, a dependência de plataformas como Google Colab para o treinamento dos modelos trouxe algumas limitações práticas. A execução em ambientes compartilhados pode limitar a flexibilidade e o controle sobre os recursos computacionais, impactando a escalabilidade e a eficiência do processo de treinamento. Estes fatores precisam ser endereçados em futuras implementações para melhorar a viabilidade prática do aprendizado federado em cenários descentralizados.
+
+\section{Trabalhos Futuros}
+\label{sec:trabalhos-futuros}
+
+Considerando as fragilidades apontadas, há espacço para futuros trabalhos referentes à solução apresentata, conforme segue:
+
+\begin{itemize}
+    \item Otimização da eficiência computacional: Investigar estratégias para reduzir o tempo de treinamento e a carga computacional associada ao aprendizado federado, incluindo a otimização dos algoritmos de comunicação e agregação.
+    \item Adaptação a diferentes tipos de dados: Explorar técnicas para lidar com a heterogeneidade dos dados distribuídos, incluindo a personalização de modelos e o ajuste de hiperparâmetros para melhorar a generalização e a precisão do modelo federado.
+    \item Implementação em ambientes práticos: Desenvolver uma implementação prática do aprendizado federado em um cenário do mundo real, considerando as limitações e desafios associados à execução em ambientes compartilhados.
+    \item Avaliação de métricas adicionais: Investigar métricas adicionais para avaliar o desempenho do modelo federado, incluindo a eficiência de comunicação, a escalabilidade e a robustez do modelo em cenários com alta variabilidade de dados.
+\end{itemize}
