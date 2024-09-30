@@ -18,9 +18,11 @@ O primeiro passo na implementação do modelo federado foi a criação de um mod
     def create_keras_model():
         model = tf.keras.models.Sequential([
             tf.keras.layers.Input(shape=(28, 28, 1)),
-            tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu'),
+            tf.keras.layers.Conv2D(32, kernel_size=(3, 3), 
+                activation='relu'),
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-            tf.keras.layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
+            tf.keras.layers.Conv2D(64, kernel_size=(3, 3), 
+                activation='relu'),
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(128, activation='relu'),
@@ -121,62 +123,55 @@ Para criar um modelo de treinamento centralizado, foi realizado um processo seme
 
 \subsection{Criação do Modelo de Aprendizado Centralizado - CNN}
 
-Neste projeto foram implementados 3 modelos de treinamento centralizado, sendo eles uma Rede Neural Convolucional (CNN), uma Rede Neural Recorrente (RNN) e um modelo Rede neural multicamadas (MLP). A seguir, será apresentado o código referente à implementação do modelo de CNN centralizado afim de ilustrar como funciona o treinamento centralizado. Ao final do capítulo, será apresentado o código completo dos 3 modelos com uma breve explicação de cada um.
+Neste projeto foram implementados 3 modelos de treinamento centralizado, sendo que cada um deles utiliza uma técnica de treinamento sendo elas: uma Rede Neural Convolucional (CNN), uma Rede Neural Recorrente (RNN) e um modelo Rede neural multicamadas (MLP). A seguir, será apresentado o código referente à implementação do modelo de CNN centralizado afim de ilustrar como funciona o treinamento centralizado. Ao final do capítulo, será apresentado o código completo dos 3 modelos com uma breve explicação de cada um.
 
 \subsubsection{Definição do Modelo Keras}
 
+A arquitetura da rede convolucional é simples, composta por duas camadas convolucionais seguidas de camadas de pooling, o que é uma escolha típica para reconhecimento de imagens. A primeira camada convolucional usa 32 filtros, e a segunda utiliza 64 filtros, mantendo o modelo relativamente leve. Isso é importante considerando o uso de recursos limitados no Google Colab, onde o tempo de treinamento e a capacidade de processamento são fatores críticos. O uso de camadas de pooling reduz a dimensionalidade dos dados, diminuindo o número de parâmetros e o tempo de computação necessário.
+
 \begin{lstlisting}[language=Python, caption={Definição do modelo Keras centralizado}, label={lst:centralized_keras_model}]
     def create_cnn_model():
-    return tf.keras.models.Sequential([
-        tf.keras.layers.Input(shape=(28, 28, 1)),
-        tf.keras.layers.Conv2D(32, kernel_size=(3, 3), 
-            activation='relu'),
-        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-        tf.keras.layers.Conv2D(64, kernel_size=(3, 3), 
-            activation='relu'),
-        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dense(10, activation='softmax')
-    ])
+        return tf.keras.models.Sequential([
+            tf.keras.layers.Input(shape=(28, 28, 1)),
+            tf.keras.layers.Conv2D(32, kernel_size=(3, 3), 
+                activation='relu'),
+            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            tf.keras.layers.Conv2D(64, kernel_size=(3, 3), 
+                activation='relu'),
+            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(128, activation='relu'),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.Dense(10, activation='softmax')
+        ])
 \end{lstlisting}
 
-Comparando com o modelo federado, a estrutura básica do modelo é a mesma, mas no federado, a criação do modelo é encapsulada em uma função TFF para suportar o treinamento distribuído, e o modelo não é compilado no momento da criação. O modelo centralizado é mais direto e é compilado imediatamente, o que simplifica a implementação.
-
-\subsubsection{Carregamento e Preparação dos Dados}
-
-\begin{lstlisting}[language=Python, caption={Carregamento e preparação dos dados centralizados}, label={lst:centralized_data}]
-    (mnist_train, mnist_train_labels), 
-    (mnist_test, mnist_test_labels) = 
-        tf.keras.datasets.mnist.load_data()
-
-    mnist_train = mnist_train / 255.0
-    mnist_test = mnist_test / 255.0
-    mnist_train = mnist_train[..., tf.newaxis].astype('float32')
-    mnist_test = mnist_test[..., tf.newaxis].astype('float32')
-\end{lstlisting}
-
-Comparado ao modelo federado, o modelo centralizado lida com dados de forma mais direta e monolítica. No modelo federado, os dados são distribuídos entre os clientes e processados em batches menores para simular um cenário de aprendizado distribuído.
+O uso de dropout com uma taxa de 0.5 na camada totalmente conectada foi implementado para evitar overfitting, uma vez que o dataset Fashion-MNIST é relativamente pequeno, e sem técnicas de regularização, o modelo poderia memorizar os dados de treino, reduzindo sua capacidade de generalizar. O dropout desativa aleatoriamente 50\% dos neurônios durante o treinamento, o que força o modelo a aprender representações mais robustas dos dados, melhorando seu desempenho nos dados de validação.
 
 \subsubsection{Criação e Compilação do Modelo Centralizado}
 
+A função de perda escolhida foi a entropia cruzada esparsa (sparse\_categorical\_crossentropy), adequada para problemas de classificação multiclasse. Ela mede a diferença entre as previsões do modelo e as classes verdadeiras, penalizando mais fortemente previsões incorretas para classes que têm maior probabilidade atribuída. O otimizador Adam foi escolhido por ser um método de otimização robusto que combina as vantagens do RMSProp e do SGD com momentum, ajustando a taxa de aprendizado dinamicamente durante o treinamento. A taxa de aprendizado inicial foi ajustada para 0.001, que é um valor conservador e permite que o modelo aprenda de forma mais gradual e estável.
+
 \begin{lstlisting}[language=Python, caption={Criação e compilação do modelo centralizado}, label={lst:centralized_model}]
     model_cnn = create_cnn_model()
-    model_cnn.compile(optimizer='adam',
-                    loss='sparse_categorical_crossentropy',
-                    metrics=['accuracy'])
+    model_cnn.compile(optimizer=
+                tf.keras.optimizers.Adam(learning_rate=0.001),
+                loss='sparse_categorical_crossentropy',
+                metrics=['accuracy'])
 \end{lstlisting}
-
-No modelo federado, a compilação não ocorre na função de criação do modelo. Em vez disso, é feita na configuração do processo de treinamento, onde funções de perda e métricas são especificadas no contexto federado.
 
 \subsubsection{Treinamento do Modelo Centralizado}
 
+Durante o treinamento, a precisão foi monitorada tanto nos dados de treinamento quanto nos de validação. A escolha pela métrica de acurácia faz sentido, dado que o problema é de classificação e a acurácia mede diretamente a proporção de previsões corretas. Além disso, a função de perda também foi monitorada para garantir que o modelo não só esteja melhorando sua acurácia, mas também minimizando a entropia cruzada ao longo das épocas.
+
 \begin{lstlisting}[language=Python, caption={Treinamento do modelo centralizado}, label={lst:centralized_training}]
     history_cnn = 
-        model_cnn.fit(mnist_train, mnist_train_labels,
-                        epochs=5, batch_size=32,
-                        validation_data=
-                            (mnist_test, mnist_test_labels))
+        model_cnn.fit(fashion_train, 
+                fashion_train_labels,
+                epochs=50,
+                batch_size=32,
+                validation_data=
+                (fashion_test, fashion_test_labels))
 \end{lstlisting}
 
 No modelo federado, o treinamento é distribuído entre vários clientes e o processo de treinamento é coordenado centralmente. A atualização dos pesos é feita de maneira agregada, o que é uma abordagem fundamentalmente diferente da atualização direta utilizada no treinamento centralizado.
@@ -228,7 +223,11 @@ A segunda parte dessa seção apresenta a implementação do modelo de treinamen
 
 \subsection{Implementação completa do Modelo de Aprendizado Federado}
 
-Esse código implementa um modelo de aprendizado federado usando o TensorFlow Federated (TFF). Primeiro, ele define um modelo de rede neural convolucional (CNN) usando o Keras, que é então convertido em um modelo federado utilizando a API do TFF. O processo de agregação federada é configurado com o algoritmo de "FedAvg" (Federação de Média Ponderada), que otimiza o modelo com o otimizador SGD tanto no cliente quanto no servidor. Os dados de treinamento do MNIST são divididos em subconjuntos para simular dados distribuídos em vários clientes. Em seguida, o treinamento é realizado por 10 rodadas, e as métricas como Acuracia, Acuracia top-3 e perda são coletadas em cada rodada. Ao final, são gerados gráficos que mostram a evolução dessas métricas ao longo das rodadas de treinamento federado.
+Este código implementa um modelo de aprendizado federado utilizando o \textit{TensorFlow Federated} (TFF). O processo começa com a criação de um modelo \textit{Keras} convolucional (CNN) para o dataset \textit{Fashion-MNIST}, que classifica imagens em 10 categorias de roupas e acessórios. A função \texttt{create\_federated\_model} transforma este modelo em uma arquitetura federada, que distribui o treinamento entre vários "clientes", preservando os dados locais. O modelo utiliza a acurácia categórica e a acurácia \textit{Top-3} como métricas, além da perda categórica esparsa.
+
+Em seguida, o código constrói o processo federado utilizando o algoritmo \textit{FedAvg} (média federada), e as funções de otimizador são configuradas tanto para o servidor quanto para os clientes. Os dados do \textit{Fashion-MNIST} são processados e distribuídos entre 10 clientes, simulando diferentes fontes de dados.
+
+Por fim, o código realiza o treinamento federado por 20 rodadas, coletando e armazenando métricas como a acurácia, a acurácia \textit{Top-3}, e a perda. O tempo total de treinamento é medido, e gráficos são gerados para visualizar a evolução das métricas ao longo das rodadas de treinamento, fornecendo insights sobre o desempenho do modelo federado.
 
 \begin{lstlisting}
     import tensorflow as tf
@@ -242,6 +241,9 @@ Esse código implementa um modelo de aprendizado federado usando o TensorFlow Fe
             tf.keras.layers.Conv2D(32, kernel_size=(3, 3), 
                 activation='relu'),
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            tf.keras.layers.Conv2D(64, kernel_size=(3, 3), 
+                activation='relu'),
+            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(128, activation='relu'),
             tf.keras.layers.Dense(10, activation='softmax')
@@ -253,9 +255,10 @@ Esse código implementa um modelo de aprendizado federado usando o TensorFlow Fe
 
         return tff.learning.models.from_keras_model(
             keras_model,
-            input_spec=(tf.TensorSpec(shape=[None, 28, 28, 1], 
-                        dtype=tf.float32),
-                        tf.TensorSpec(shape=[None], dtype=tf.int64)),
+            input_spec=
+                (tf.TensorSpec(shape=[None, 28, 28, 1], 
+                    dtype=tf.float32),
+                tf.TensorSpec(shape=[None], dtype=tf.int64)),
             loss=tf.keras.losses.SparseCategoricalCrossentropy(),
             metrics=[
                 tf.keras.metrics.SparseCategoricalAccuracy(),
@@ -267,7 +270,7 @@ Esse código implementa um modelo de aprendizado federado usando o TensorFlow Fe
         return tff.learning.algorithms.build_unweighted_fed_avg(
             model_fn=create_federated_model,
             client_optimizer_fn=lambda: 
-                tf.keras.optimizers.SGD(learning_rate=0.02),
+                tf.keras.optimizers.Adam(learning_rate=0.001),
             server_optimizer_fn=lambda: 
                 tf.keras.optimizers.SGD(learning_rate=1.0)
         )
@@ -275,32 +278,36 @@ Esse código implementa um modelo de aprendizado federado usando o TensorFlow Fe
     def preprocess(dataset):
         return dataset.map(lambda x, y: 
             (tf.cast(tf.expand_dims(x, -1), tf.float32), 
-            tf.cast(y, tf.int64))).batch(20).repeat(10)
+                tf.cast(y, tf.int64))).batch(20)
 
-    def create_client_data(images, labels, num_clients=10, 
-        num_samples_per_client=6000):
-            client_data = []
-            for i in range(num_clients):
-                client_images = images[i*num_samples_per_client:
-                    (i+1)*num_samples_per_client]
-                client_labels = labels[i*num_samples_per_client:
-                    (i+1)*num_samples_per_client]
-                dataset = tf.data.Dataset.from_tensor_slices(
-                    (client_images, client_labels))
-                client_data.append(dataset)
+    def create_client_data(images, labels, 
+            num_clients=10, num_samples_per_client=6000):
+        client_data = []
+        for i in range(num_clients):
+            client_images = 
+                images[i*num_samples_per_client:(i+1)*
+                    num_samples_per_client]
+            client_labels = 
+                labels[i*num_samples_per_client:(i+1)*
+                    num_samples_per_client]
+            dataset = 
+                tf.data.Dataset.from_tensor_slices((client_images,
+                    client_labels))
+            client_data.append(preprocess(dataset))
         return client_data
 
-    (mnist_train_images, mnist_train_labels), 
-    (mnist_test_images, mnist_test_labels) = 
-        tf.keras.datasets.mnist.load_data()
-    
-    mnist_train_images = mnist_train_images / 255.0
-    mnist_test_images = mnist_test_images / 255.0
+    (fashion_train_images, fashion_train_labels),
+    (fashion_test_images, fashion_test_labels) = 
+        tf.keras.datasets.fashion_mnist.load_data()
 
-    federated_train_data = [preprocess(data) for data in 
-        create_client_data(mnist_train_images, mnist_train_labels)]
-    federated_test_data = [preprocess(data) for data in 
-        create_client_data(mnist_test_images, mnist_test_labels)]
+    fashion_train_images = fashion_train_images / 255.0
+    fashion_test_images = fashion_test_images / 255.0
+
+    federated_train_data = 
+        create_client_data(fashion_train_images, fashion_train_labels)
+    federated_test_data = 
+        preprocess(tf.data.Dataset.from_tensor_slices(
+                (fashion_test_images, fashion_test_labels)))
 
     iterative_process = build_federated_averaging_process()
 
@@ -313,71 +320,80 @@ Esse código implementa um modelo de aprendizado federado usando o TensorFlow Fe
     start_time = time.time()
 
     print('Rodando treinamento federado...')
-    for round_num in range(1, 11):
+    for round_num in range(1, 21):
         state, metrics = 
             iterative_process.next(state, federated_train_data)
-        print(f'Rodada {round_num}: {metrics}')
+        print(f'Rodada {round_num}/20: {metrics}')
 
-        accuracy_per_round.append(metrics
-            ['client_work']['train']
-            ['sparse_categorical_accuracy'])
-        
-        top_k_accuracy_per_round.append(metrics
-            ['client_work']['train']
-            ['sparse_top_k_categorical_accuracy'])
-        
-        loss_per_round.append(metrics['client_work']
-            ['train']['loss'])
+        accuracy_per_round.append(
+            metrics['client_work']
+                   ['train']
+                   ['sparse_categorical_accuracy'])
+        top_k_accuracy_per_round.append(
+            metrics['client_work']
+                   ['train']
+                   ['sparse_top_k_categorical_accuracy'])
+        loss_per_round.append(
+            metrics['client_work']
+                   ['train']
+                   ['loss'])
 
     end_time = time.time()
     total_training_time = end_time - start_time
     print(f'Tempo total de treinamento: 
         {total_training_time:.2f} segundos')
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(1, 11), 
-        accuracy_per_round, marker='o', 
-        linestyle='-', color='b', label='Acuracia')
-    plt.title('Acuracia por Rodada de Treinamento Federado')
-    plt.xlabel('Rodada')
-    plt.ylabel('Acuracia')
-    plt.grid(True)
-    plt.legend()
-    plt.show()
+    def plot_metrics(metric_values, metric_name, title, ylabel, color):
+        plt.figure(figsize=(10, 6))
+        plt.plot(range(1, len(metric_values) + 1), 
+                metric_values, 
+                marker='o', 
+                linestyle='-', 
+                color=color, 
+                label=metric_name)
+        plt.title(title)
+        plt.xlabel('Rodada')
+        plt.ylabel(ylabel)
+        plt.grid(True)
+        plt.legend()
+        plt.show()
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(1, 11), top_k_accuracy_per_round, 
-        marker='o', linestyle='-', 
-        color='g', label='Acuracia Top-3')
-    plt.title('Acuracia Top-3 por Rodada de Treinamento Federado')
-    plt.xlabel('Rodada')
-    plt.ylabel('Acuracia Top-3')
-    plt.grid(True)
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(1, 11), loss_per_round, 
-        marker='o', linestyle='-', 
-        color='r', label='Perda')
-    plt.title('Perda por Rodada de Treinamento Federado')
-    plt.xlabel('Rodada')
-    plt.ylabel('Perda')
-    plt.grid(True)
-    plt.legend()
-    plt.show()
+    plot_metrics(accuracy_per_round, 'Acuracia', 
+        'Acuracia por Rodada de Treinamento Federado', 
+        'Acuracia', 'b')
+    plot_metrics(top_k_accuracy_per_round, 'Acuracia Top-3', 
+        'Acuracia Top-3 por Rodada de Treinamento Federado', 
+        'Acuracia Top-3', 'g')
+    plot_metrics(loss_per_round, 'Perda', 
+        'Perda por Rodada de Treinamento Federado', 
+        'Perda', 'r')
 \end{lstlisting}
 
 \subsection{Implementação completa do Modelo de Aprendizado Centralizado - CNN}
 
-Esse código implementa e treina um modelo de rede neural convolucional (CNN) em dados do MNIST usando TensorFlow. O modelo possui duas camadas convolucionais seguidas por camadas de pooling e uma camada densa totalmente conectada. Após a normalização dos dados de entrada (dividindo por 255), o modelo é compilado usando o otimizador Adam e a função de perda de entropia cruzada categórica esparsa.
+O código implementa um modelo de rede neural convolucional (CNN) utilizando o \textit{TensorFlow} para o dataset \textit{Fashion-MNIST}, que contém imagens de roupas classificadas em 10 categorias. O processo começa carregando e normalizando os dados para valores entre 0 e 1. Em seguida, o código adiciona uma dimensão aos dados, necessária para que a CNN processe as imagens.
 
-Em seguida, o modelo é treinado por 5 Epocas com um batch size de 32, e o tempo total de treinamento é calculado. Após o treinamento, o modelo é avaliado nos dados de teste, e a precisão final é impressa. O código também gera dois gráficos: um que mostra a evolução da Acuracia e outro que mostra a perda durante o treinamento e a Validacao.
+O modelo CNN é definido com várias camadas, incluindo duas camadas convolucionais com 32 e 64 filtros, respectivamente, cada uma seguida por uma camada de \textit{max pooling} para redução dimensional. Após as camadas convolucionais, há uma camada totalmente conectada (\textit{dense}) com 128 neurônios e uma função de ativação \textit{ReLU}. O \textit{dropout} é utilizado para prevenir \textit{overfitting}, e a última camada utiliza \textit{softmax} para classificar as 10 categorias.
+
+O modelo é compilado usando o otimizador \textit{Adam} e a função de perda de \textit{entropia cruzada categórica esparsa}. O treinamento é realizado ao longo de 50 épocas com os dados de treinamento, e o modelo é avaliado nos dados de teste, fornecendo as métricas de acurácia e perda. Ao final, são plotados gráficos para visualizar a evolução da acurácia e da perda durante o treinamento e a validação.
+
+Essas escolhas de arquitetura e parâmetros visam otimizar a capacidade de generalização do modelo sem \textit{overfitting}, ao mesmo tempo em que o modelo é suficientemente robusto para o conjunto de dados relativamente simples como o \textit{Fashion-MNIST}.
 
 \begin{lstlisting}
     import tensorflow as tf
+    import numpy as np
     import matplotlib.pyplot as plt
     import time
+
+    (fashion_train, fashion_train_labels),
+    (fashion_test, fashion_test_labels) = 
+        tf.keras.datasets.fashion_mnist.load_data()
+
+    fashion_train = fashion_train / 255.0
+    fashion_test = fashion_test / 255.0
+
+    fashion_train = fashion_train[..., np.newaxis]
+    fashion_test = fashion_test[..., np.newaxis]
 
     def create_cnn_model():
         return tf.keras.models.Sequential([
@@ -390,162 +406,96 @@ Em seguida, o modelo é treinado por 5 Epocas com um batch size de 32, e o tempo
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(128, activation='relu'),
+            tf.keras.layers.Dropout(0.5),
             tf.keras.layers.Dense(10, activation='softmax')
         ])
 
-    (mnist_train, mnist_train_labels), 
-    (mnist_test, mnist_test_labels) = 
-        tf.keras.datasets.mnist.load_data()
-    
-    mnist_train = mnist_train / 255.0
-    mnist_test = mnist_test / 255.0
-    mnist_train = mnist_train[..., tf.newaxis].astype('float32')
-    mnist_test = mnist_test[..., tf.newaxis].astype('float32')
-
     model_cnn = create_cnn_model()
 
-    model_cnn.compile(optimizer='adam',
-                    loss='sparse_categorical_crossentropy',
-                    metrics=['accuracy'])
+    model_cnn.compile(optimizer=
+            tf.keras.optimizers.Adam(learning_rate=0.001),
+            loss='sparse_categorical_crossentropy',
+            metrics=['accuracy'])
 
     start_time = time.time()
 
-    history_cnn = 
-        model_cnn.fit(mnist_train, mnist_train_labels,
-                        epochs=5, batch_size=32,
-                        validation_data=
-                            (mnist_test, mnist_test_labels))
+    history_cnn = model_cnn.fit(fashion_train, 
+                    fashion_train_labels,
+                    epochs=50,  
+                    batch_size=32,
+                    validation_data=
+                        (fashion_test, fashion_test_labels))
 
     end_time = time.time()
     total_time_cnn = end_time - start_time
-    
     print(f'\nTempo total de treinamento (CNN): 
         {total_time_cnn:.2f} segundos')
 
     test_loss_cnn, test_acc_cnn = 
-        model_cnn.evaluate(mnist_test, mnist_test_labels)
-    print(f'\nPrecisao do modelo CNN nos dados de teste: 
-        {test_acc_cnn}')
+        model_cnn.evaluate(fashion_test, fashion_test_labels)
+    print(f'\nPrecisao do modelo CNN 
+        nos dados de teste: {test_acc_cnn}')
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(history_cnn.history['accuracy'], 
-        label='Acuracia de Treinamento (CNN)')
-    plt.plot(history_cnn.history['val_accuracy'], 
-        label='Acuracia de Validacao (CNN)')
-    plt.title('Acuracia durante o Treinamento e Validacao (CNN)')
-    plt.xlabel('Epocas')
-    plt.ylabel('Acuracia')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    def plot_metrics(history, metric_name, title, ylabel):
+        plt.figure(figsize=(10, 5))
+        plt.plot(history.history[metric_name], 
+            label=f'{ylabel} de Treinamento (CNN)')
+        plt.plot(history.history[f'val_{metric_name}'], 
+            label=f'{ylabel} de Validacao (CNN)')
+        plt.title(title)
+        plt.xlabel('Epocas')
+        plt.ylabel(ylabel)
+        plt.xticks(np.arange(0, 
+            len(history.history[metric_name]), step=1))
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(history_cnn.history['loss'], 
-        label='Perda de Treinamento (CNN)')
-    plt.plot(history_cnn.history['val_loss'], 
-        label='Perda de Validacao (CNN)')
-    plt.title('Perda durante o Treinamento e Validacao (CNN)')
-    plt.xlabel('Epocas')
-    plt.ylabel('Perda')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    plot_metrics(history_cnn, 'accuracy', 
+        'Acuracia durante o Treinamento e Validacao (CNN)', 
+        'Acuracia')
+    plot_metrics(history_cnn, 'loss', 
+        'Perda durante o Treinamento e Validacao (CNN)', 
+        'Perda')
 \end{lstlisting}
-
-\subsection{Implementação completa do Modelo de Aprendizado Centralizado - DNN}
-
-O  código a seguir define, treina e avalia um modelo de rede neural profunda (DNN) para a classificação de dígitos do MNIST. O modelo DNN é construído com cinco camadas densas, começando com uma camada de entrada que achata a entrada 28x28 pixels para um vetor unidimensional, seguido por camadas densas com 1024, 512, 256 e 128 neurônios, respectivamente, e uma camada de saída com 10 neurônios, correspondente às 10 classes de dígitos, usando a função de ativação softmax.
-
-Após definir o modelo, ele é compilado usando o otimizador Adam e a função de perda \texttt{sparse\_categorical\_crossentropy}. O treinamento é realizado por 5 épocas com um tamanho de batch de 32. O tempo total de treinamento é calculado e impresso. O modelo é então avaliado nos dados de teste para obter a precisão. Os gráficos mostram a evolução da acurácia e da perda durante o treinamento e validação, fornecendo uma visão visual do desempenho do modelo ao longo das épocas.
-
-
-\begin{lstlisting}
-    import tensorflow as tf
-    import matplotlib.pyplot as plt
-    import time
-
-    def create_dnn_model():
-        return tf.keras.models.Sequential([
-            tf.keras.layers.Input(shape=(28, 28, 1)),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(1024, activation='relu'),
-            tf.keras.layers.Dense(512, activation='relu'),
-            tf.keras.layers.Dense(256, activation='relu'),
-            tf.keras.layers.Dense(128, activation='relu'),
-            tf.keras.layers.Dense(10, activation='softmax')
-        ])
-
-    model_dnn = create_dnn_model()
-
-    model_dnn.compile(optimizer='adam',
-                    loss='sparse_categorical_crossentropy',
-                    metrics=['accuracy'])
-
-    start_time = time.time()
-
-    history_dnn = model_dnn.fit(mnist_train, mnist_train_labels,
-                                epochs=5, batch_size=32,
-                                validation_data=
-                                    (mnist_test, mnist_test_labels))
-
-    end_time = time.time()
-    total_time_dnn = end_time - start_time
-    print(f'\nTempo total de treinamento (DNN): 
-        {total_time_dnn:.2f} segundos')
-
-    test_loss_dnn, test_acc_dnn = 
-        model_dnn.evaluate(mnist_test, mnist_test_labels)
-    print(f'\nPrecisao do modelo DNN nos dados de teste: 
-        {test_acc_dnn}')
-
-    plt.figure(figsize=(10, 5))
-    plt.plot(history_dnn.history['accuracy'], 
-        label='Acuracia de Treinamento (DNN)')
-    plt.plot(history_dnn.history['val_accuracy'], 
-        label='Acuracia de Validacao (DNN)')
-    plt.title('Acuracia durante o Treinamento e Validacao (DNN)')
-    plt.xlabel('Epocas')
-    plt.ylabel('Acuracia')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-
-    plt.figure(figsize=(10, 5))
-    plt.plot(history_dnn.history['loss'], 
-        label='Perda de Treinamento (DNN)')
-    plt.plot(history_dnn.history['val_loss'], 
-        label='Perda de Validacao (DNN)')
-    plt.title('Perda durante o Treinamento e Validacao (DNN)')
-    plt.xlabel('Epocas')
-    plt.ylabel('Perda')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-\end{lstlisting}
-    
 
 \subsection{Implementação completa do Modelo de Aprendizado Centralizado - MLP}
 
-Esse código implementa e treina um modelo de rede neural multicamada para a classificação do conjunto de dados MNIST. O modelo é composto por quatro camadas densas (fully connected), com funções de ativação ReLU nas três primeiras e softmax na camada de saída, que possui 10 neurônios, correspondendo às classes de dígitos do MNIST.
+Este código implementa um modelo de \textit{Perceptron Multicamadas} (MLP) utilizando a biblioteca \textit{TensorFlow} para o dataset \textit{Fashion-MNIST}. O código é estruturado em diversas etapas, começando pelo carregamento e normalização dos dados, que são dimensionados para o intervalo de 0 a 1, como forma de otimizar o processo de treinamento.
 
-Os dados de entrada são achatados de uma matriz de 28x28 para um vetor de 784 elementos, uma exigência para redes MLP. O modelo é compilado usando o otimizador Adam e a função de perda de entropia cruzada categórica esparsa. Após o treinamento de 5 Epocas, o tempo total de treinamento é calculado e impresso. O modelo também é avaliado em dados de teste, e as métricas de Acuracia e perda são plotadas em gráficos para visualizar o desempenho durante o treinamento e a Validacao.
+Após isso, os dados de entrada são remodelados em uma estrutura linear adequada para um MLP (removendo a dimensão do canal de cores e transformando cada imagem em um vetor unidimensional de 784 valores). Em seguida, o modelo MLP é definido com quatro camadas densas, sendo as três primeiras camadas com 512, 256 e 128 neurônios e ativação \textit{ReLU}, para introduzir não-linearidade, e uma última camada de 10 neurônios, utilizando \textit{softmax} para a classificação das imagens em uma das 10 categorias do \textit{Fashion-MNIST}. O \textit{dropout} é utilizado para regularização e prevenir \textit{overfitting}.
+
+O modelo é compilado com o otimizador \textit{Adam} e a função de perda de \textit{entropia cruzada categórica esparsa}, que é ideal para problemas de classificação com múltiplas classes. O treinamento é realizado por 50 épocas, e as métricas de desempenho, como \textit{acurácia} e \textit{perda}, são monitoradas tanto nos dados de treinamento quanto de validação. Por fim, gráficos são gerados para visualizar a evolução da acurácia e da perda ao longo das épocas, oferecendo uma visão clara do comportamento do modelo durante o treinamento e validação.
+
+Esse modelo MLP é uma alternativa mais simples em relação às redes convolucionais, focando em capturar padrões globais dos dados sem levar em conta a estrutura espacial das imagens, como fazem as CNNs.
 
 \begin{lstlisting}
     import tensorflow as tf
+    import numpy as np
     import matplotlib.pyplot as plt
     import time
+
+    (fashion_train, fashion_train_labels), 
+    (fashion_test, fashion_test_labels) = 
+        tf.keras.datasets.fashion_mnist.load_data()
+
+    fashion_train = fashion_train / 255.0
+    fashion_test = fashion_test / 255.0
+
+    fashion_train_mlp = 
+        fashion_train.reshape(-1, 28 * 28)
+    fashion_test_mlp = 
+        fashion_test.reshape(-1, 28 * 28)
 
     def create_mlp_model():
         return tf.keras.models.Sequential([
             tf.keras.layers.Input(shape=(28 * 28,)),
             tf.keras.layers.Dense(512, activation='relu'),
+            tf.keras.layers.Dropout(0.5),
             tf.keras.layers.Dense(256, activation='relu'),
             tf.keras.layers.Dense(128, activation='relu'),
             tf.keras.layers.Dense(10, activation='softmax')
         ])
-
-    mnist_train_mlp = mnist_train.reshape(-1, 28 * 28)
-    mnist_test_mlp = mnist_test.reshape(-1, 28 * 28)
 
     model_mlp = create_mlp_model()
 
@@ -555,45 +505,127 @@ Os dados de entrada são achatados de uma matriz de 28x28 para um vetor de 784 e
 
     start_time = time.time()
 
-    history_mlp = 
-        model_mlp.fit(mnist_train_mlp, mnist_train_labels,
-                        epochs=5, batch_size=32,
-                        validation_data=
-                        (mnist_test_mlp, mnist_test_labels))
+    history_mlp = model_mlp.fit(fashion_train_mlp, 
+                                fashion_train_labels,
+                                epochs=50,  
+                                batch_size=32,
+                                validation_data=(fashion_test_mlp, 
+                                    fashion_test_labels))
 
     end_time = time.time()
     total_time_mlp = end_time - start_time
-    
     print(f'\nTempo total de treinamento (MLP): 
         {total_time_mlp:.2f} segundos')
 
     test_loss_mlp, test_acc_mlp = 
-        model_mlp.evaluate(mnist_test_mlp, mnist_test_labels)
-    
-        print(f'\nPrecisao do modelo MLP nos dados de teste: 
-        {test_acc_mlp}')
+        model_mlp.evaluate(fashion_test_mlp, fashion_test_labels)
+    print(f'\nPrecisao do modelo MLP 
+            nos dados de teste: {test_acc_mlp}')
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(history_mlp.history['accuracy'], 
-        label='Acuracia de Treinamento (MLP)')
-    plt.plot(history_mlp.history['val_accuracy'], 
-        label='Acuracia de Validacao (MLP)')
-    plt.title('Acuracia durante o Treinamento e Validacao (MLP)')
-    plt.xlabel('Epocas')
-    plt.ylabel('Acuracia')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    def plot_metrics(history, metric_name, title, ylabel):
+        plt.figure(figsize=(10, 5))
+        plt.plot(history.history[metric_name], 
+            label=f'{ylabel} de Treinamento (MLP)')
+        plt.plot(history.history[f'val_{metric_name}'], 
+            label=f'{ylabel} de Validacao (MLP)')
+        plt.title(title)
+        plt.xlabel('Epocas')
+        plt.ylabel(ylabel)
+        plt.xticks(np.arange(1, 
+            len(history.history[metric_name])+1, step=1))
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(history_mlp.history['loss'], 
-        label='Perda de Treinamento (MLP)')
-    plt.plot(history_mlp.history['val_loss'], 
-        label='Perda de Validacao (MLP)')
-    plt.title('Perda durante o Treinamento e Validacao (MLP)')
-    plt.xlabel('Epocas')
-    plt.ylabel('Perda')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    plot_metrics(history_mlp, 'accuracy', 
+        'Acuracia durante o Treinamento e Validacao (MLP)', 
+        'Acuracia')
+    plot_metrics(history_mlp, 'loss', 
+        'Perda durante o Treinamento e Validacao (MLP)', 
+        'Perda')
+\end{lstlisting}
+
+\subsection{Implementação completa do Modelo de Aprendizado Centralizado - DNN}
+
+Este código implementa um modelo de MLP profunda, simulando uma rede neural profunda (DNN) para classificar imagens do conjunto de dados \textit{Fashion-MNIST} utilizando o \textit{TensorFlow}. A base de dados é carregada e normalizada, com os valores dos pixels sendo ajustados entre 0 e 1 para melhorar o desempenho durante o treinamento. Diferente de uma CNN (rede neural convolucional), as imagens são diretamente achatadas em vetores unidimensionais com 784 pixels (28x28) antes de serem processadas pelas camadas densas da DNN.
+
+O modelo implementado possui uma arquitetura com quatro camadas densas completamente conectadas (\textit{fully connected}). A primeira camada contém 1024 neurônios com ativação \textit{ReLU}, seguida de uma camada \textit{Dropout} para evitar o \textit{overfitting}. Em seguida, temos camadas de 512, 256, e 128 neurônios com ativação \textit{ReLU}, e a camada final contém 10 neurônios com ativação \textit{softmax} para a saída de classificação em 10 classes, correspondentes às diferentes categorias do \textit{Fashion-MNIST}.
+
+O modelo é treinado usando o otimizador \textit{Adam} e a função de perda \textit{sparse\_categorical\_crossentropy}, apropriada para problemas de classificação com várias classes. O treinamento ocorre ao longo de 50 épocas, com monitoramento das métricas de \textit{acurácia} e \textit{perda} tanto no conjunto de treinamento quanto de validação, permitindo verificar a evolução e o ajuste do modelo. Ao final, as métricas são plotadas para oferecer uma visualização clara do desempenho do modelo ao longo do treinamento.
+
+\begin{lstlisting}
+    import tensorflow as tf
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import time
+
+    (fashion_train, fashion_train_labels), 
+    (fashion_test, fashion_test_labels) = 
+        tf.keras.datasets.fashion_mnist.load_data()
+
+    fashion_train = fashion_train / 255.0
+    fashion_test = fashion_test / 255.0
+
+    fashion_train = fashion_train[..., np.newaxis]
+    fashion_test = fashion_test[..., np.newaxis]
+
+    def create_dnn_model():
+        return tf.keras.models.Sequential([
+            tf.keras.layers.Input(shape=(28, 28, 1)),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(1024, activation='relu'),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.Dense(512, activation='relu'),
+            tf.keras.layers.Dense(256, activation='relu'),
+            tf.keras.layers.Dense(128, activation='relu'),
+            tf.keras.layers.Dense(10, activation='softmax')
+        ])
+
+    model_dnn = create_dnn_model()
+
+    model_dnn.compile(optimizer=
+                    tf.keras.optimizers.Adam(learning_rate=0.001),
+                    loss='sparse_categorical_crossentropy',
+                    metrics=['accuracy'])
+
+    start_time = time.time()
+
+    history_dnn = model_dnn.fit(fashion_train, 
+                                fashion_train_labels,
+                                epochs=50,
+                                batch_size=32,
+                                validation_data=(fashion_test, 
+                                    fashion_test_labels))
+
+    end_time = time.time()
+    total_time_dnn = end_time - start_time
+    print(f'\nTempo total de treinamento (DNN): 
+        {total_time_dnn:.2f} segundos')
+
+    test_loss_dnn, test_acc_dnn = 
+        model_dnn.evaluate(fashion_test, fashion_test_labels)
+    print(f'\nPrecisao do modelo DNN 
+        nos dados de teste: {test_acc_dnn}')
+
+    def plot_metrics(history, metric_name, title, ylabel):
+        plt.figure(figsize=(10, 5))
+        plt.plot(history.history[metric_name], 
+            label=f'{ylabel} de Treinamento (DNN)')
+        plt.plot(history.history[f'val_{metric_name}'], 
+            label=f'{ylabel} de Validacao (DNN)')
+        plt.title(title)
+        plt.xlabel('Epocas')
+        plt.ylabel(ylabel)
+        plt.xticks(np.arange(1, 
+            len(history.history[metric_name]) + 1, step=1))
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    plot_metrics(history_dnn, 'accuracy', 
+        'Acuracia durante o Treinamento e Validacao (DNN)', 
+        'Acuracia')
+    plot_metrics(history_dnn, 'loss', 
+        'Perda durante o Treinamento e Validacao (DNN)', 
+        'Perda')
 \end{lstlisting}
