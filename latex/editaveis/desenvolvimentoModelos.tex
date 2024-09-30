@@ -4,7 +4,7 @@
 
 O problema central que o modelo de aprendizado federado busca resolver reside na exposição potencial de dados sensíveis quando centralizados em um único servidor para treinamento de modelos de IA. Em vez de enviar os dados dos dispositivos para um servidor central, onde poderiam ser acessados ou comprometidos, o aprendizado federado propõe um paradigma descentralizado no qual os dispositivos realizam o treinamento localmente, compartilhando apenas os parâmetros do modelo (como pesos e gradientes) com o servidor central. Esta abordagem permite que os dispositivos colaborem no desenvolvimento de um modelo global sem nunca expor os dados locais. 
 
-A estruturação do problema foi conduzida considerando-se um cenário prático, onde múltiplos dispositivos, cada um contendo dados não identicamente distribuídos (não-IID), contribuem para o treinamento de um modelo de classificação de imagens (utilizando o conjunto de dados MNIST como referência). Este cenário foi escolhido por refletir uma situação comum em aplicações reais, onde dados como registros de saúde, preferências de usuários ou informações financeiras são distribuídos entre dispositivos pessoais e não podem ser compartilhados diretamente por questões de privacidade e conformidade com regulamentos como o GDPR. Assim, a metodologia abrange a implementação de um modelo federado que deve ser capaz de aprender de maneira eficiente e precisa a partir de dados dispersos, preservando a privacidade, e enfrenta desafios como a heterogeneidade dos dispositivos, a variabilidade da conectividade de rede e a necessidade de garantir a convergência do modelo global. A escolha do aprendizado federado, mais especificamente do processo Federated Averaging (FedAvg), é justificada pela sua capacidade de operar eficientemente em ambientes com essas características, buscando balancear a necessidade de proteção dos dados com a performance do modelo treinado.
+A estruturação do problema foi conduzida considerando-se um cenário prático, onde múltiplos dispositivos, cada um contendo dados não identicamente distribuídos (não-IID), contribuem para o treinamento de um modelo de classificação de imagens (utilizando o conjunto de dados Fashion-MNIST como referência). Este cenário foi escolhido por refletir uma situação comum em aplicações reais, onde dados como registros de saúde, preferências de usuários ou informações financeiras são distribuídos entre dispositivos pessoais e não podem ser compartilhados diretamente por questões de privacidade e conformidade com regulamentos como o GDPR. Assim, o método desenvolvido abrange a implementação de um modelo federado que deve ser capaz de aprender de maneira eficiente e precisa a partir de dados dispersos, preservando a privacidade, e enfrenta desafios como a heterogeneidade dos dispositivos, a variabilidade da conectividade de rede e a necessidade de garantir a convergência do modelo global. A escolha do aprendizado federado, mais especificamente do processo Federated Averaging (FedAvg), é justificada pela sua capacidade de operar eficientemente em ambientes com essas características, buscando balancear a necessidade de proteção dos dados com a performance do modelo treinado.
 
 \section{Implementação do Modelo de Aprendizado Federado}
 
@@ -12,12 +12,15 @@ Para melhor entendimento, foi dividido em seções a implementação do código 
 
 \subsection{Definição do Modelo Keras}
 
+O primeiro passo na implementação do modelo federado foi a criação de um modelo Keras básico, que servirá como base para o treinamento federado. O modelo foi projetado para a base de dados Fashion-MNIST, que contém imagens de roupas divididas em 10 classes. A estrutura escolhida para esse modelo é uma Convolutional Neural Network (CNN), que é ideal para processar imagens. A CNN foi configurada com duas camadas de convolução seguidas por camadas de pooling, um padrão comum em tarefas de classificação de imagens, pois essas camadas são muito eficazes na extração de características visuais. A última parte do modelo é uma camada densa com 128 neurônios e a camada de saída com 10 neurônios, correspondendo às classes da base de dados.
+
 \begin{lstlisting}[language=Python, caption={Função para criar um modelo Keras}, label={lst:create_keras_model}]
     def create_keras_model():
         model = tf.keras.models.Sequential([
             tf.keras.layers.Input(shape=(28, 28, 1)),
-            tf.keras.layers.Conv2D(32, kernel_size=(3, 3), 
-                activation='relu'),
+            tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu'),
+            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            tf.keras.layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(128, activation='relu'),
@@ -26,10 +29,11 @@ Para melhor entendimento, foi dividido em seções a implementação do código 
         return model
 \end{lstlisting}
     
-
-A criação do modelo Keras neste ponto é feita utilizando uma rede neural convolucional (CNN) simples, apropriada para a tarefa de classificação de imagens. A escolha de uma CNN com camadas convolucionais (Conv2D) é natural para lidar com o conjunto de dados MNIST, que consiste em imagens de dígitos manuscritos de 28x28 pixels em escala de cinza. A arquitetura definida é clássica: começa com uma camada convolucional para extrair características visuais seguidas de uma camada de pooling (MaxPooling2D) para reduzir dimensionalidade e complexidade, além de prevenir overfitting. A camada Flatten é utilizada para achatar a saída da camada convolucional para um formato unidimensional, o que permite a conexão com a camada densa (Dense), que atua como classificador. A escolha da função de ativação ReLU nas camadas intermediárias é estratégica, pois introduz não-linearidade, tornando a rede capaz de aprender relações complexas nos dados. A camada final usa softmax, adequada para tarefas de classificação multiclasse, já que o MNIST contém 10 classes (dígitos de 0 a 9). Essa arquitetura é uma escolha padrão para começar com a classificação de imagens simples e fornece uma base sólida para implementar um modelo federado.
+A escolha de uma CNN foi feita devido ao seu ótimo desempenho em tarefas de visão computacional, como é o caso do Fashion-MNIST, onde características como bordas, texturas e padrões podem ser capturados e processados de forma eficiente pelas camadas convolucionais.
 
 \subsection{Construção do Modelo Federado}
+
+Uma escolha importante ao implementar um modelo federado é como serão avaliadas as métricas de desempenho. Além da acurácia tradicional (\textit{Sparse Categorical Accuracy}), foi adicionada a métrica de Acurácia \textit{Top-3} (\textit{Sparse Top-K Categorical Accuracy}), que avalia se a classe correta está entre as três previsões mais prováveis feitas pelo modelo. Essa escolha é interessante em contextos onde o erro de classificação é aceitável se a previsão correta estiver próxima do topo, o que pode ser útil em sistemas de recomendação ou em ambientes onde há muitas classes e as previsões precisam ser refinadas ao longo do tempo.
 
 \begin{lstlisting}[language=Python, caption={Construção do modelo federado}, label={lst:build_federated_model}]
     def create_federated_model():
@@ -48,53 +52,54 @@ A criação do modelo Keras neste ponto é feita utilizando uma rede neural conv
     )
 \end{lstlisting}
 
-A função \texttt{tff.learning.models.from\_keras\_model} é usada para integrar o modelo Keras ao fluxo de aprendizado federado no TensorFlow Federated. A especificação de entrada (\textit{input\_spec}) define como os dados serão representados em termos de tipo e forma, essencial para garantir que o modelo possa lidar corretamente com o formato dos dados federados, onde múltiplos dispositivos podem ter seus próprios subconjuntos de dados. A função de perda escolhida é a \textit{SparseCategoricalCrossentropy}, ideal para tarefas de classificação onde os rótulos das classes são inteiros. A métrica \textit{SparseCategoricalAccuracy} foi selecionada por ser apropriada para medir a precisão em tarefas de classificação de rótulos discretos. Essa escolha mantém consistência com as práticas padrão para modelos de classificação e permite uma transição tranquila para um ambiente federado.
+Ao incluir essa métrica no modelo federado, a expectativa era observar uma melhora no desempenho geral ao lidar com a base de dados distribuída, onde as variabilidades dos dados entre os dispositivos podem dificultar a obtenção de acurácia elevada de imediato. A Acurácia Top-3 oferece uma margem para avaliar se o modelo está capturando informações corretas em um cenário mais flexível.
 
 \subsection{Construção do Processo de Federado}
 
+O processo federado foi implementado utilizando o algoritmo Federated Averaging, que combina os pesos atualizados de cada cliente em um servidor central, onde os modelos locais são treinados nos dados locais e suas atualizações são agregadas. A escolha do Federated Averaging se deve à sua eficiência e simplicidade, especialmente ao lidar com grandes quantidades de dados distribuídos. Além disso, ele permite que os dispositivos participantes treinem seus modelos localmente e compartilhem apenas os gradientes ou atualizações dos pesos, preservando assim a privacidade dos dados dos usuários.
+
 \begin{lstlisting}[language=Python, caption={Construção do processo federado}, label={lst:build_federated_process}]
     def build_federated_averaging_process():
-    return tff.learning.algorithms.build_unweighted_fed_avg(
-        model_fn=create_federated_model,
-        client_optimizer_fn=lambda: 
-            tf.keras.optimizers.SGD(learning_rate=0.02),
-        server_optimizer_fn=lambda: 
-            tf.keras.optimizers.SGD(learning_rate=1.0)
+        return tff.learning.algorithms.build_unweighted_fed_avg(
+            model_fn=create_federated_model,
+            client_optimizer_fn=lambda: 
+                tf.keras.optimizers.Adam(learning_rate=0.001),
+            server_optimizer_fn=lambda: 
+                tf.keras.optimizers.SGD(learning_rate=1.0)
     )
 \end{lstlisting}
 
-A escolha do algoritmo de treinamento federado, o \textit{FedAvg} (Federated Averaging), é uma das mais utilizadas em aprendizado federado por ser simples e eficaz. O \textit{FedAvg} permite que cada cliente (dispositivo) atualize localmente o modelo com base em seus dados privados, e depois envia essas atualizações para o servidor, onde elas são agregadas. A função \texttt{build\_unweighted\_fed\_avg} constrói esse processo de agregação sem ponderar a contribuição de cada cliente, o que é adequado para cenários com uma distribuição de dados homogênea entre os clientes. 
-
-Para a otimização, foi escolhido o \textit{SGD} (Stochastic Gradient Descent) tanto para os clientes quanto para o servidor, um otimizador padrão em redes neurais, por sua simplicidade e eficiência em problemas de classificação. A taxa de aprendizado para os clientes foi ajustada para um valor menor (0.02) para garantir que cada cliente faça pequenas atualizações locais, evitando grandes variações que poderiam desestabilizar o treinamento. Para o servidor, a taxa de aprendizado foi configurada para um valor mais alto (1.0), uma escolha comum para permitir que a média das atualizações dos clientes seja aplicada de forma mais agressiva no modelo global.
+Foi utilizado o otimizador Adam nos dispositivos locais, uma escolha feita para lidar melhor com as variações nos dados entre diferentes dispositivos, já que o Adam tem uma capacidade adaptativa de ajustar a taxa de aprendizado com base nas características dos dados. O otimizador SGD foi usado no servidor para combinar as atualizações dos modelos, garantindo uma convergência mais estável.
 
 \subsection{Preparação dos Dados}
 
+A etapa de preparação dos dados é crítica em um modelo federado. Aqui, os dados foram normalizados e divididos entre 10 clientes, simulando diferentes dispositivos locais. Essa divisão é importante para simular um ambiente federado realista, onde diferentes dispositivos possuem subconjuntos dos dados totais e, portanto, variabilidades nas distribuições de dados.
+
 \begin{lstlisting}[language=Python, caption={Preparação dos dados}, label={lst:data_preparation}]
     def preprocess(dataset):
-        return dataset.map(lambda x, y: (
-                tf.cast(tf.expand_dims(x, -1), tf.float32), 
-                tf.cast(y, tf.int64))
-            ).batch(20).repeat(10)
+        return dataset.map(lambda x, y: 
+            (tf.cast(tf.expand_dims(x, -1), tf.float32), 
+             tf.cast(y, tf.int64))).batch(20)
 
-    def create_client_data(images, labels, 
-            num_clients=10, num_samples_per_client=6000):
+    def create_client_data(images, labels, num_clients=10, 
+            num_samples_per_client=6000):
         client_data = []
         for i in range(num_clients):
             client_images = 
-                images[i*num_samples_per_client:
-                    (i+1)*num_samples_per_client]
+                images[i*num_samples_per_client:(i+1)*
+                        num_samples_per_client]
             client_labels = 
-                labels[i*num_samples_per_client:
-                    (i+1)*num_samples_per_client]
-            dataset = tf.data.Dataset.from_tensor_slices(
-                (client_images, client_labels))
-            client_data.append(dataset)
+                labels[i*num_samples_per_client:(i+1)*
+                        num_samples_per_client]
+            dataset = 
+                tf.data.Dataset.from_tensor_slices(
+                    (client_images, client_labels))
+
+            client_data.append(preprocess(dataset))
         return client_data
 \end{lstlisting}
 
-A preparação dos dados é uma etapa fundamental, especialmente em aprendizado federado, onde os dados são distribuídos entre diferentes ``clientes'' (dispositivos). O processo de preparação transforma as imagens do MNIST para o formato adequado, normalizando os dados para a faixa de valores [0, 1], o que facilita o treinamento, já que o modelo tende a convergir melhor com dados normalizados. A função \texttt{preprocess} garante que cada lote de dados seja preparado corretamente, convertendo o formato para tensores e realizando o \textit{batching} (agrupamento em lotes) de 20 amostras. A escolha de repetir os dados (\texttt{repeat(10)}) aumenta o número de amostras disponíveis para treinamento em cada cliente. 
-
-A função \texttt{create\_client\_data} é responsável por distribuir os dados de maneira federada entre os clientes simulados, dividindo igualmente o conjunto de dados entre 10 clientes. Essa abordagem permite que cada cliente tenha uma quantidade razoável de dados, simulando cenários do mundo real, onde os dispositivos (como smartphones) possuem seus próprios subconjuntos de dados.
+A escolha da base de dados Fashion-MNIST foi feita pela simplicidade e familiaridade desse conjunto no treinamento de modelos de classificação de imagens. Ele oferece um bom balanço entre complexidade visual e tamanho, sendo leve o suficiente para ser usado em dispositivos locais sem grandes recursos computacionais.
 
 \subsection{Treinamento do Modelo Federado}
 
@@ -102,13 +107,13 @@ A função \texttt{create\_client\_data} é responsável por distribuir os dados
     iterative_process = build_federated_averaging_process()
     state = iterative_process.initialize()
 
-    for round_num in range(1, 11):
+    for round_num in range(1, 21):
         state, metrics = 
             iterative_process.next(state, federated_train_data)
         print(f'Rodada {round_num}: {metrics}')
 \end{lstlisting}
 
-O treinamento é executado através de um processo iterativo, onde o modelo é treinado em múltiplas rodadas. A escolha de 10 rodadas de treinamento permite uma observação inicial do comportamento do modelo federado sem sobrecarregar o sistema. Em cada rodada, os clientes locais treinam o modelo com seus dados privados e enviam as atualizações para o servidor central, onde as atualizações são agregadas para formar um modelo global atualizado. O uso da função \texttt{next} no TensorFlow Federated aplica a agregação de \textit{FedAvg}, onde as médias das atualizações dos clientes são calculadas. O feedback das métricas de cada rodada permite acompanhar a evolução do modelo, especialmente em termos de precisão (via \textit{SparseCategoricalAccuracy}), oferecendo uma visão clara de como o modelo está se ajustando aos dados federados ao longo do tempo.
+O treinamento é executado através de um processo iterativo, onde o modelo é treinado em múltiplas rodadas. A escolha de 20 rodadas de treinamento permite uma observação inicial do comportamento do modelo federado sem sobrecarregar o sistema. Em cada rodada, os clientes locais treinam o modelo com seus dados privados e enviam as atualizações para o servidor central, onde as atualizações são agregadas para formar um modelo global atualizado. O uso da função \texttt{next} no TensorFlow Federated aplica a agregação de \textit{FedAvg}, onde as médias das atualizações dos clientes são calculadas. O feedback das métricas de cada rodada permite acompanhar a evolução do modelo, especialmente em termos de precisão (via \textit{SparseCategoricalAccuracy}), oferecendo uma visão clara de como o modelo está se ajustando aos dados federados ao longo do tempo.
 
 \section{Implementação do Modelo de Aprendizado Centralizado}
 
@@ -447,7 +452,7 @@ Em seguida, o modelo é treinado por 5 Epocas com um batch size de 32, e o tempo
     plt.show()
 \end{lstlisting}
 
-\subsection{Implementação completa do Modelo de Aprendizado Centralizado - RNN}
+\subsection{Implementação completa do Modelo de Aprendizado Centralizado - DNN}
 
 O  código a seguir define, treina e avalia um modelo de rede neural profunda (DNN) para a classificação de dígitos do MNIST. O modelo DNN é construído com cinco camadas densas, começando com uma camada de entrada que achata a entrada 28x28 pixels para um vetor unidimensional, seguido por camadas densas com 1024, 512, 256 e 128 neurônios, respectivamente, e uma camada de saída com 10 neurônios, correspondente às 10 classes de dígitos, usando a função de ativação softmax.
 

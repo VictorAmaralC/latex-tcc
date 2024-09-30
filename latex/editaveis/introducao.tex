@@ -1,9 +1,10 @@
-\chapter*[Introdução]{Introdução}
+\chapter[Introdução]{Introdução}
 \addcontentsline{toc}{chapter}{Introdução}
+\label{chap:introducao}
 
-Neste capítulo, é conferida uma breve \hyperref[sec:contextualizacao]{Contextualização}, no intuito de deixar mais claro sobre o domínio no qual o trabalho está inserido, bem como para apresentar o problema a ser tratado no mesmo. Neste sentido, é acordada uma definição para privacidade de dados, uma vez que se pretende contribuir para um acompanhamento mais adequado desse topico durante o desenvolvimento do sistema. 
+Neste capítulo, é apresentada uma breve \hyperref[sec:contextualizacao]{Contextualização}, no intuito de deixar mais claro sobre o domínio no qual o trabalho está inserido, bem como para apresentar o problema a ser tratado no mesmo. Neste sentido, é acordada uma definição para privacidade de dados, uma vez que se pretende contribuir para um acompanhamento mais adequado desse topico durante o desenvolvimento do sistema. 
 
-Sendo assim, os domínios de interesse são Aprendizado federado e Privacidade de dados. Pretende-se desenvolver um modelo de treinamento de aprendizado federado e outro modelo com treinamento centralizado a fim de comparar métricas obtidas ao final de cada treinamento. Na sequência, têm-se a \hyperref[sec:justificativa]{Justificativa} para a realização do trabalho e os \hyperref[sec:objetivos]{Objetivos} a serem atingidos. Por fim, há uma breve noção quanto à \hyperref[sec:metodologia]{Metodologia} adotada no trabalho, e a apresentação da \hyperref[sec:organizacao]{Organização da Monografia}.
+Sendo assim, os domínios de interesse são Aprendizado federado e Privacidade de dados. Pretende-se desenvolver um modelo de treinamento de aprendizado federado e outro modelo com treinamento centralizado a fim de comparar métricas obtidas ao final de cada treinamento. Na sequência, têm-se a \hyperref[sec:justificativa]{Justificativa} para a realização do trabalho e os \hyperref[sec:objetivos]{Objetivos} a serem atingidos. Por fim, há uma breve noção quanto aos \hyperref[sec:metodologia]{materiais e métodos} adotadas no trabalho, e a apresentação da \hyperref[sec:organizacao]{Organização da Monografia}.
 
 \section{Contextualização}
 \label{sec:contextualizacao}
@@ -17,7 +18,7 @@ A Inteligência Artificial (IA) tem se tornado uma presença cada vez mais marca
     \label{fig:investimentoIA}
 \end{figure}
 
-Essa crescente utilização desses modelos reflete a busca incessante por soluções que otimizem processos, tomem decisões e aprimorem a experiência do usuário, como é refletido nas expectativas sobre o impacto da adoção de modelos de inteligência artificial no mercado de trabalho para os próximos anos, Figura \ref{fig:capacidadeIA}. No entanto, essa onipresença da IA também traz consigo desafios significativos, especialmente quando se trata do tratamento de dados sensíveis e da privacidade dos usuários.
+Essa crescente utilização desses modelos reflete a busca incessante por soluções que otimizem processos, tomem decisões e aprimorem a experiência do usuário, como é refletido nas expectativas sobre o impacto da adoção de modelos de inteligência artificial no mercado de trabalho para os próximos anos, Figura \ref{fig:capacidadeIA}. No entanto, essa onipresença da IA também traz consigo desafios, especialmente quando se trata do tratamento de dados sensíveis e da privacidade dos usuários.
 
 \begin{figure}[h]
     \centering
@@ -26,9 +27,9 @@ Essa crescente utilização desses modelos reflete a busca incessante por soluç
     \label{fig:capacidadeIA}
 \end{figure}
 
-A IA, em sua essência, de acordo com as definições de \cite{russel}, refere-se à capacidade de máquinas aprenderem a partir de dados e executarem tarefas complexas sem intervenção humana direta. Seus métodos de treinamento envolvem algoritmos que ajustam seus parâmetros com base em exemplos históricos, permitindo que modelos preditivos sejam criados. No entanto, quando lidamos com dados descentralizados, como os provenientes de dispositivos pessoais, surge um dilema: como treinar modelos eficazes sem comprometer a privacidade dos usuários?
+A IA, em sua essência, de acordo com a definição mais recente de Stuart Russell, é descrita como o estudo de agentes inteligentes que podem perceber seu ambiente e tomar decisões para alcançar objetivos de forma autônoma. Estes agentes operam em contextos dinâmicos e incertos, ajustando-se ao ambiente para otimizar suas ações. A IA busca construir sistemas que possam agir de maneira racional, onde a "racionalidade" é definida pela capacidade de tomar decisões corretas, maximizando o sucesso com base nas informações disponíveis \cite{russell2022}. No entanto, quando lidamos com dados descentralizados, como os provenientes de dispositivos pessoais, surge um dilema: como treinar modelos eficazes sem comprometer a privacidade dos usuários?
 
-O termo "privacidade de dados" ganhou destaque no campo de tecnologias em resposta à crescente preocupação sobre como as informações pessoais dos indivíduos são coletadas, armazenadas, processadas e compartilhadas. Historicamente, o conceito de privacidade sempre esteve presente, mas a explosão no volume de dados digitais, especialmente com o advento da internet e das redes sociais, trouxe à tona desafios significativos em relação à segurança e à confidencialidade das informações pessoais.
+O termo "privacidade de dados" ganhou destaque no campo de tecnologias em resposta à crescente preocupação sobre como as informações pessoais dos indivíduos são coletadas, armazenadas, processadas e compartilhadas. Historicamente, o conceito de privacidade sempre esteve presente, mas a explosão no volume de dados digitais, especialmente com o advento da internet e das redes sociais, trouxe à tona desafios em relação à segurança e à confidencialidade das informações pessoais.
 
 O marco regulatório, como a Diretiva de Proteção de Dados Pessoais da União Europeia (GDPR) \cite{GDPR}, promulgada em 2016, evidencia a crescente importância atribuída à privacidade de dados em nível global. A GDPR estabeleceu normas rigorosas para a coleta e o processamento de dados pessoais, visando proporcionar aos indivíduos um maior controle sobre suas informações pessoais.
 
@@ -42,9 +43,11 @@ O aprendizado federado, do inglês federated learning (FL) foi primeiramente des
 "Nós nomeamos nossa abordagem como Federated Learning, uma vez que a tarefa de aprendizagem é resolvida por uma ampla federação de dispositivos participantes (que chamamos de clientes) que são coordenados por um servidor central \cite{mcmahan2017communication}."
 \end{citacao}
 
-A proposta do aprendizado federado no campo de \emph{Machine Learning} (ML) tem suas raízes em questões de privacidade de dados e descentralização, o conceito começou a ganhar destaque no final da década de 2010 como uma abordagem para treinar modelos de ML em dados distribuídos, sem a necessidade de centralizar todos os dados em um único local. Resumindo, FL é um paradigma de aprendizado onde modelos estísticos são treinados em um sistema distribuído \cite{li2020preserving}.
+Aprendizado de Máquina (AM), conforme descrito por \cite{russell2022} e \cite{goodfellow2016}, refere-se ao campo da inteligência artificial que estuda algoritmos capazes de aprender padrões e tomar decisões com base em dados. A ideia central é que, ao invés de serem explicitamente programados para realizar uma tarefa, os modelos de AM ajustam seus parâmetros com base em grandes conjuntos de dados, de modo a gerar previsões ou classificar informações de maneira autônoma. O objetivo é permitir que as máquinas melhorem seu desempenho à medida que recebem mais informações e exemplos.
 
-Em aplicações de FL no mundo real, as partes individuais necessitam de motivação para utilizarem um  sistema de aprendizado federado (FLS), essa motivação pode virf de regulamentações ou incentivos. Quem decide utilizar o FL pode se beneficar com seu modelo de alta precisão\cite{LI}. Por exemplo, hospitais durante a pandemia utilizaram um sistema de ML , treinado utilizando o aprendizado federado, para classificar imagens de torax diferentes fontes (raio-x e ultrassom) com o intuíto de auxiliar no diagnóstico de COVID-19\cite{qayyum2022collaborative}.
+A proposta do aprendizado federado no campo de \emph{Machine Learning} (ML) tem suas raízes em questões de privacidade de dados e descentralização. O conceito começou a ganhar destaque no final da década de 2010 como uma abordagem para treinar modelos de ML em dados distribuídos, sem a necessidade de centralizar todos os dados em um único local. Resumindo, FL é um paradigma de aprendizado onde modelos estatísticos são treinados em um sistema distribuído \cite{li2020preserving}.
+
+Em aplicações de FL no mundo real, as partes individuais necessitam de motivação para utilizarem um  sistema de aprendizado federado (FLS), essa motivação pode vir de regulamentações ou incentivos. Quem decide utilizar o FL pode se beneficar com seu modelo de alta precisão\cite{LI}. Por exemplo, hospitais durante a pandemia utilizaram um sistema de ML , treinado utilizando o aprendizado federado, para classificar imagens de torax diferentes fontes (raio-x e ultrassom) com o intuíto de auxiliar no diagnóstico de COVID-19\cite{qayyum2022collaborative}.
 
 Treinar modelos em redes heterogêneas e de grande escala trazem consigo uma nova gama de desafios que requerem uma abordagem fundamentalmente diferente das abordagens tradicionais de treinamento para aprendizado de máquina em larga escala \cite{li3}. Abordaremos durante o capítulo de fundamentação teórica os principais desafios que esse novo paradigma traz consigo, seus benefícios e o que está sendo estudado da área atualmente.
 
@@ -74,9 +77,9 @@ O presente trabalho é de viés aplicado, demandando atividades de pesquisa e de
 
 \textbf{Questão de Pesquisa:} Como o Aprendizado Federado se destaca como uma solução eficaz para o treinamento de modelos de Inteligência Artificial em ambientes descentralizados, e de que maneira ele preserva a privacidade dos usuários durante esse processo?
 
-Diante de estudos preliminares já realizados até o momento, e dada a relevância que a área de Inteligência Artificial vem ganhando nos últimos anos, surge uma crescente preocupacação a respeito de como são distribuídos os dados para treinamento dos modelos. O objetivo deste estudo é explorar e analisar a aplicabilidade do modelo de treinamento do aprendizado federado para a preservação e manutenção da privacidade de dados dos usuários. Demais informações sobre o tema serão conferidas no \hyperref[chap:teorico]{Capítulo 2 - Referencial Teórico}.
+Diante de estudos preliminares já realizados até o momento, e dada a relevância que a área de Inteligência Artificial vem ganhando nos últimos anos, surge uma crescente preocupacação a respeito de como são distribuídos os dados para treinamento dos modelos. O objetivo deste estudo é explorar e analisar a aplicabilidade do modelo de treinamento do aprendizado federado para a preservação e manutenção da privacidade de dados dos usuários. Demais informações sobre o tema serão apresentadas no \hyperref[chap:teorico]{Capítulo 2 - Referencial Teórico}.
 
-\textbf{Questão de Desenvolvimento:} Quais são os desafios e limitações mais significativos associados à implementação prática do AF em cenários descentralizados, especialmente em termos de eficiência computacional, comunicação entre dispositivos e adaptação a diferentes tipos de dados?
+\textbf{Questão de Desenvolvimento:} Quais são os desafios e limitações associados à implementação prática do AF em cenários descentralizados, especialmente em termos de eficiência computacional, comunicação entre dispositivos e adaptação a diferentes tipos de dados?
 
 A implementação prática do Aprendizado Federado em cenários descentralizados enfrenta desafios que afetam sua eficiência computacional, a comunicação entre dispositivos e a adaptação a diferentes tipos de dados. Primeiramente, a heterogeneidade de dispositivos e redes pode resultar em variações significativas na eficiência do treinamento. A comunicação entre dispositivos é limitada por questões de largura de banda e latência, impactando diretamente a sincronização eficiente dos modelos federados. Adicionalmente, a diversidade nos tipos de dados distribuídos impõe desafios na harmonização e adaptação de modelos para garantir a generalização adequada.
 
@@ -85,15 +88,15 @@ Neste sentido, há uma necessidade de um estudo mais criterioso sobre como desen
 \section{Objetivos}
 \label{sec:objetivos}
 
-O objetivo fundamental deste projeto é explorar e analisar a aplicabilidade do Aprendizado Federado no contexto do treinamento de modelos de Inteligência Artificial em ambientes descentralizados. Este estudo é motivado pela crescente importância de preservar a privacidade dos usuários em um cenário em que dados sensíveis estão distribuídos em dispositivos diversos, como dispositivos móveis, sensores IoT e servidores locais.
+A proposta desse trabalho visa explorar e analisar a aplicabilidade do Aprendizado Federado no contexto do treinamento de modelos de Inteligência Artificial em ambientes descentralizados. Este estudo é motivado pela crescente importância de preservar a privacidade dos usuários em um cenário em que dados sensíveis estão distribuídos em dispositivos diversos, como dispositivos móveis, sensores IoT e servidores locais.
 
 O diferencial desta pesquisa reside na abordagem abrangente e aprofundada do AF em ambientes descentralizados, focando não apenas nos aspectos técnicos, mas também nas implicações éticas e práticas associadas. Ao considerar a heterogeneidade de dados, desafios de comunicação, e a necessidade crítica de proteger informações sensíveis, este estudo visa oferecer insights valiosos para o desenvolvimento e implementação eficaz de sistemas de IA federados.
 
 A importância deste trabalho é evidenciada pela urgência de encontrar soluções que conciliem os avanços em IA com a proteção da privacidade individual. À medida que a coleta e o processamento de dados descentralizados se tornam a norma, a comunidade científica e a indústria enfrentam o desafio de assegurar que os modelos de IA derivados desses dados não comprometam a privacidade dos usuários. Neste contexto, o AF surge como uma abordagem promissora, e este trabalho busca contribuir para a compreensão profunda de suas implicações, desafios e melhores práticas.
 
-As contribuições deste estudo para a área de IA são diversas. Primeiramente, espera-se fornecer diretrizes práticas para a implementação bem-sucedida do AF em ambientes descentralizados, considerando os aspectos práticos e éticos. Além disso, ao abordar questões de segurança e conformidade com regulamentações de privacidade, este trabalho busca fortalecer a confiança na aplicação do AF. Por fim, ao delinear as possíveis evoluções futuras do AF e seu papel na preservação da privacidade, este estudo visa inspirar pesquisas subsequentes e avanços significativos na área.
+As contribuições deste estudo para a área de IA são diversas. Primeiramente, espera-se fornecer diretrizes práticas para a implementação bem-sucedida do AF em ambientes descentralizados, considerando os aspectos práticos e éticos. Além disso, ao abordar questões de segurança e conformidade com regulamentações de privacidade, este trabalho busca fortalecer a confiança na aplicação do AF. Por fim, ao delinear as possíveis evoluções futuras do AF e seu papel na preservação da privacidade, este estudo visa inspirar pesquisas subsequentes e avanços na área.
 
-Neste contexto, o \textbf{Objetivo geral} é investigar como o treinamento de inteligências artificiais por meio do aprendizado federado pode ser efetivamente aplicado no contexto de dados descentralizados, considerando a preservação da privacidade dos usuários e a proteção do provedor do serviço. 
+Neste contexto, o \textbf{Objetivo geral} é investigar como o treinamento de inteligências artificiais por meio do aprendizado federado pode ser efetivamente aplicado no contexto de dados descentralizados. 
 
 Com o norte do objetivo geral e sua abrangência prevista, pretende-se atingi-lo através do cumprimimento de alguns \textbf{Objetivos específicos} sendo eles: 
 
@@ -112,10 +115,10 @@ Com o norte do objetivo geral e sua abrangência prevista, pretende-se atingi-lo
 \end{itemize}
 .
 
-\section{Metodologia}
+\section{Materiais e Métodos}
 \label{sec:metodologia}
 
-No capítulo de metodologia, serão tratados os aspectos metodológicos do trabalho de forma mais adequada. Entretanto, visando esclarecer alguns pontos, o trabalho pode ser classificado segundo \cite{GIL}, quanto:
+No capítulo de materiais e métodos, serão tratados os aspectos metodológicos do trabalho de forma mais adequada. Entretanto, visando esclarecer alguns pontos, o trabalho pode ser classificado segundo \cite{GIL}, quanto:
 
 \begin{itemize}
     \item \textbf{Quanto aos objetivos}: a pesquisa é classificada como exploratória, pois busca explorar o tema do aprendizado federado e sua aplicabilidade no treinamento de modelos de IA em ambientes descentralizados, bem como investigar os desafios e limitações associados à implementação prática do AF.
@@ -131,7 +134,7 @@ A monografia está organizada em capítulos, conforme a seguir:
 \begin{itemize}
     \item Capítulo 1 - Fundamentação Teorica: Neste capítulo, são apresentados os conceitos fundamentais relacionados ao aprendizado federado, privacidade de dados, segurança em IA e tópicos relacionados. O objetivo é fornecer uma base teórica sólida para a compreensão do tema e a análise dos resultados.
     \item Capítulo 2 - Referencial Tecnológico: descreve as principais tecnologias, ferramentas e frameworks, ou seja, o arcabouço tecnológico que viabilizou não apenas o desenvolvimento da solução em si, mas também seu planejamento, sua especificação e sua análise;
-    \item Capítulo 3 - Metodologia: descreve os procedimentos técnicos e metodológicos adotados para a realização do trabalho, incluindo a revisão bibliográfica, a coleta de dados, a análise dos resultados e a avaliação da solução proposta;
+    \item Capítulo 3 - Materiais e métodos: descreve os procedimentos técnicos e metodológicos adotados para a realização do trabalho, incluindo a revisão bibliográfica, a coleta de dados, a análise dos resultados e a avaliação da solução proposta;
     \item Capítulo 4 - Desenvolvimento: descreve o desenvolvimento da solução proposta, a implementação dos modelos de IA, a integração com as tecnologias selecionadas e os resultados obtidos;
     \item Capítulo 5 - Análise de Resultados: apresenta a análise dos resultados obtidos, a comparação entre os modelos de IA treinados e a discussão sobre os desafios e limitações identificados;
     \item Capítulo 6 - Conclusão: apresenta as conclusões finais do trabalho, destacando as contribuições, as limitações e as sugestões para trabalhos futuros.

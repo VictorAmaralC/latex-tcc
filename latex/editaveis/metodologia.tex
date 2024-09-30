@@ -1,14 +1,14 @@
-\chapter[Metodologia]{Metodologia}
-\addcontentsline{toc}{chapter}{Metodologia}
+\chapter[metodologia]{Materiais e Métodos}
+\addcontentsline{toc}{chapter}{Materiais e Métodos}
 \label{chap:metodologia}
 
 \section{Método adotado}
 
-Este trabalho adota uma abordagem de revisão de literatura integrativa combinada com um estudo experimental. A revisão de literatura tem como objetivo sintetizar o estado atual da pesquisa sobre aprendizado federado (Federated Learning – FL), focando em sua aplicabilidade no treinamento de modelos de IA com dados descentralizados, preservando a privacidade dos usuários. A revisão será baseada em artigos científicos, teses, dissertações e relatórios de conferências. O estudo experimental complementará a revisão, implementando um modelo de aprendizado federado utilizando o framework TensorFlow Federated (TFF) para treinar uma rede neural com o conjunto de dados MNIST distribuído. Esse estudo permitirá comparar o desempenho de um modelo federado com um modelo centralizado, verificando as vantagens e desvantagens práticas do aprendizado federado em termos de precisão e privacidade.
+Este trabalho adota uma abordagem de revisão de literatura integrativa combinada com um estudo experimental. A revisão de literatura tem como objetivo sintetizar o estado atual da pesquisa sobre aprendizado federado (Federated Learning – FL), focando em sua aplicabilidade no treinamento de modelos de IA com dados descentralizados, preservando a privacidade dos usuários. A revisão será baseada em artigos científicos, teses, dissertações e relatórios de conferências. O estudo experimental complementará a revisão, implementando um modelo de aprendizado federado utilizando o framework TensorFlow Federated (TFF) para treinar uma rede neural com o conjunto de dados Fashion-MNIST distribuído. Esse estudo permitirá comparar o desempenho de um modelo federado com um modelo centralizado, verificando as vantagens e desvantagens práticas do aprendizado federado em termos de precisão e privacidade.
 
 \section{Fonte de Dados}
 
-A coleta de dados será dividida em duas partes: fontes teóricas e fontes práticas. Para as fontes teóricas, serão consultados artigos científicos, livros, dissertações e teses indexados em bases de dados acadêmicas, como IEEE Xplore, ACM Digital Library, SpringerLink, e Google Scholar. A seleção desses artigos seguirá critérios detalhados mais adiante. Já a fonte de dados prática será o conjunto de dados MNIST, amplamente utilizado em experimentos de aprendizado de máquina para o reconhecimento de dígitos manuscritos. O MNIST será aplicado tanto no treinamento centralizado quanto no treinamento federado, permitindo uma comparação direta entre os métodos.
+A coleta de dados será dividida em duas partes: fontes teóricas e fontes práticas. Para as fontes teóricas, serão consultados artigos científicos, livros, dissertações e teses indexados em bases de dados acadêmicas, como IEEE Xplore, ACM Digital Library, SpringerLink, e Google Scholar. A seleção desses artigos seguirá critérios detalhados mais adiante. Já a fonte de dados prática será o conjunto de dados Fashion-MNIST. A base de dados será aplicada tanto no treinamento centralizado quanto no treinamento federado, permitindo uma comparação direta entre os métodos.
 
 \section{Critérios de Inclusão e Exclusão}
 
@@ -37,7 +37,7 @@ A coleta de dados teóricos será realizada em três fases principais:
 2. Análise de relevância: cada artigo será avaliado com base nos títulos e resumos para verificar a aderência aos critérios de inclusão e exclusão.
 3. Leitura aprofundada: os artigos selecionados serão lidos na íntegra, com ênfase nos objetivos, metodologia e resultados, focando nas discussões que envolvem aprendizado federado, privacidade e comparações entre modelos centralizados e federados.
 
-Para a parte prática, o conjunto de dados MNIST será particionado de forma a simular um cenário de dados descentralizados, onde os dados serão distribuídos em vários "clientes". Esses clientes terão acesso a subconjuntos dos dados completos, conforme a configuração típica de um sistema de aprendizado federado.
+Para a parte prática, o conjunto de dados Fashion-MNIST será particionado de forma a simular um cenário de dados descentralizados, onde os dados serão distribuídos em vários "clientes". Esses clientes terão acesso a subconjuntos dos dados completos, conforme a configuração típica de um sistema de aprendizado federado.
 
 \section{Análise de Dados}
 

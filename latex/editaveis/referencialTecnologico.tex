@@ -14,13 +14,6 @@ Seguem as principais ferramentas que serão consumidas para viabilizar o desenvo
 
 \subsection{Python}
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.25]{figuras/referencialTecnologico/python.eps}
-    \caption{Logo Python}
-    \label{fig:python}
-\end{figure}
-
 Python é uma linguagem de programação de alto nível, interpretada e de propósito geral, conhecida por sua simplicidade e legibilidade. Criada por Guido van Rossum, Ela foi concebida com ênfase na facilidade de uso e na capacidade de expressar ideias de forma concisa. Seu design modular e sintaxe clara a torna uma escolha popular tanto para iniciantes quanto para desenvolvedores experientes. A filosofia central de Python, conhecida como "Zen of Python," destaca princípios como clareza, simplicidade e praticidade, guiando o desenvolvimento da linguagem.
 
 A linguagem suporta diversos paradigmas de programação, sendo mais notavelmente associado à programação orientada a objetos. No entanto, a linguagem é multifacetada, permitindo abordagens imperativas, funcionais e procedural. Essa flexibilidade permite aos desenvolvedores escolherem o paradigma que melhor se adapta ao problema em questão, contribuindo para a versatilidade da linguagem em diferentes contextos de desenvolvimento.
@@ -32,13 +25,6 @@ A sintaxe clara e a legibilidade do Python tornam o desenvolvimento de algoritmo
 Outro ponto crucial é a popularidade e o suporte contínuo que Python recebe na comunidade de ciência de dados e IA. A abundância de frameworks e bibliotecas especializadas, como TensorFlow, PyTorch e scikit-learn, todos com interfaces amigáveis, consolida a posição da linguagem como uma escolha estratégica para desenvolvedores e pesquisadores em IA. A combinação de acessibilidade, riqueza de ferramentas e apoio da comunidade faz de Python uma linguagem ideal para a concepção, prototipagem e implementação eficiente de soluções de inteligência artificial.
 
 \subsection{TensorFlow}
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=0.05]{figuras/referencialTecnologico/tensorflow.eps}
-	\caption{Logo TensorFlow}
-	\label{fig:tensorflow}
-\end{figure}
 
 TensorFlow é uma poderosa biblioteca de código aberto desenvolvida pelo Google, projetada para facilitar a implementação de algoritmos de aprendizado de máquina e redes neurais. Destaca-se como uma das ferramentas mais populares e abrangentes no campo da inteligência artificial (IA) e aprendizado de máquina (ML). Seu nome deriva da estrutura subjacente de dados que representa fluxos multidimensionais, essenciais para operações matemáticas eficientes, fundamentais no contexto do aprendizado profundo.
 
@@ -60,27 +46,15 @@ Assim como o TensorFlow, o Keras também se beneficia de uma comunidade ativa, r
 
 \subsection{Google Colab}
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=0.25]{figuras/referencialTecnologico/googleColab.eps}
-	\caption{Logo Google Colab}
-	\label{fig:colab}
-\end{figure}
-
 O Google Colab é uma plataforma baseada em nuvem que oferece um ambiente interativo para o desenvolvimento e execução de código Python, especialmente voltado para o aprendizado de máquina e análise de dados. A ferramenta proporciona a capacidade de criar e compartilhar notebooks Jupyter, que permitem a integração de código executável, visualizações e texto descritivo em um único documento. O Google Colab é amplamente valorizado por sua acessibilidade, uma vez que não requer configuração local e oferece acesso a recursos computacionais avançados, como unidades de processamento gráfico (GPUs) e unidades de processamento tensorial (TPUs), sem custo adicional.
 
 No contexto deste projeto, o Google Colab foi utilizado para implementar e testar o modelo de aprendizado federado. A plataforma facilitou a execução do código de maneira eficiente e a utilização de GPUs para acelerar o treinamento do modelo, o que foi crucial para lidar com a complexidade do aprendizado federado e o processamento de grandes conjuntos de dados. Além disso, o Google Colab permitiu a documentação do progresso por meio de notebooks, que incluíram não apenas o código e os resultados das execuções, mas também as análises e visualizações das métricas de desempenho do modelo. A possibilidade de compartilhar facilmente os notebooks com os orientadores e colegas foi um aspecto importante para a colaboração e revisão contínua do projeto.
 
-\subsection{Base de dados MNIST}
+\subsection{Base de dados Fashion-MNIST}
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=0.25]{figuras/referencialTecnologico/mnist.eps}
-	\caption{MNIST exemplo de dados}
-	\label{fig:mnist}
-\end{figure}
+A base de dados Fashion-MNIST foi desenvolvida como uma alternativa mais complexa ao tradicional MNIST, visando representar um cenário mais próximo de aplicações reais em visão computacional. Composta por imagens de 28x28 pixels em tons de cinza, ela contém 70.000 imagens divididas em 10 classes, todas relacionadas a itens de vestuário, como camisetas, sapatos, bolsas e casacos. Cada classe possui uma variabilidade significativa em termos de estilo e design, o que desafia os modelos de aprendizado de máquina a reconhecer padrões sutis entre os diferentes itens.
 
-A base de dados MNIST (Modified National Institute of Standards and Technology) é uma coleção amplamente utilizada de imagens de dígitos manuscritos que serve como um benchmark padrão para o treinamento e avaliação de algoritmos de aprendizado de máquina e redes neurais. Composta por 60.000 imagens de treinamento e 10.000 imagens de teste, cada imagem é uma matriz de 28x28 pixels em escala de cinza, representando um dígito de 0 a 9. Esta base de dados é ideal para testar modelos de classificação e redes neurais devido à sua simplicidade e ao tamanho relativamente pequeno dos dados, o que facilita a experimentação e a validação rápida de novas técnicas. A escolha do MNIST como base de dados é estratégica para avaliar o impacto de abordagens federadas em um cenário relativamente simples, fornecendo insights valiosos sobre a aplicabilidade e os desafios associados a essas técnicas em ambientes de dados reais e distribuídos.
+No contexto do aprendizado federado, que é o foco principal do projeto, o Fashion-MNIST oferece uma excelente oportunidade para testar a robustez de modelos distribuídos na identificação de padrões em dados não centralizados. Como os dados de usuários de dispositivos móveis, por exemplo, estão frequentemente dispersos e não podem ser agregados facilmente por questões de privacidade, a variabilidade dos dados na base Fashion-MNIST simula um ambiente similar. Cada dispositivo ou cliente pode treinar um subconjunto desses dados, representando diferentes distribuições de moda, para então colaborar no aprimoramento de um modelo global.
 
 \section{Outros Apoios Tecnológicos}
 \label{sec:demais}
@@ -103,13 +77,6 @@ em forma de texto simples, sem haver tanta preocupação com a formatação dura
 e organização das pastas, além de ser utilizado para compilar a monografia em formato PDF.
 
 \subsection{GitHub}
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=1]{figuras/referencialTecnologico/github.eps}
-	\caption{Logo GitHub}
-	\label{fig:github}
-\end{figure}
 
 O GitHub é uma plataforma amplamente utilizada para o versionamento de código e colaboração em projetos de software. Baseado no sistema de controle de versão Git, o GitHub oferece uma interface web que permite o gerenciamento de repositórios de código, acompanhamento de mudanças e coordenação entre equipes de desenvolvimento. A plataforma proporciona funcionalidades essenciais como a criação de branches para desenvolvimento paralelo, pull requests para revisão de código e issues para rastreamento de bugs e tarefas. 
 

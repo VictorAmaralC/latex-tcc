@@ -1,10 +1,10 @@
-\chapter[Analise dos Resultados]{Analise dos Resultados e Discussões}
+\chapter[Analise dos Resultados]{Análise dos Resultados e Discussões}
 \addcontentsline{toc}{chapter}{analise dos Resultados e discussões}
 \label{chap:analiseResultados}
 
-Este capítulo apresenta a análise dos resultados obtidos com a execução dos modelos de treinamento centralizado e distribuído. Além disso, é exposta a análise do autor referente aos dados coletados e as impressões obtidas durante a execução dos experimentos. Confere-se, inicialmente há a apresentação dos resultados obtidos, acompanhada pela \hyperref{sec:resultados}{Análise dos Resultados}. Posteriormente, são discutidas as dificuldades e limitações encontradas durante a execução dos experimentos.
+Este capítulo apresenta a análise dos resultados obtidos com a execução dos modelos de treinamento centralizado e distribuído. Além disso, é exposta a análise do autor referente aos dados coletados e as impressões obtidas durante a execução dos experimentos. Inicialmente há a apresentação dos resultados obtidos, acompanhada pela \hyperref{sec:resultados}{Análise dos Resultados}. Posteriormente, são discutidas as dificuldades e limitações encontradas durante a execução dos experimentos.
 
-Serão apresentados e discutidos os desempenhos dos modelos desenvolvidos ao longo do projeto, tanto no contexto centralizado quanto no federado. Três modelos centralizados foram implementados: uma rede neural convolucional (CNN), uma rede neural multicamadas (MLP) e uma rede neural profunda (DNN). Esses modelos serão comparados com o modelo de aprendizado federado, permitindo uma análise detalhada das métricas obtidas, como acurácia, precisão, recall, F1-score e o tempo de processamento. A comparação entre os modelos visa identificar as vantagens e limitações de cada abordagem, destacando o impacto do aprendizado federado na preservação de privacidade dos dados e na eficiência do treinamento distribuído.
+Serão apresentados e discutidos os desempenhos dos modelos desenvolvidos ao longo do projeto, tanto no contexto centralizado quanto no federado. Três modelos centralizados foram implementados: uma rede neural convolucional (CNN), uma rede neural multicamadas (MLP) e uma rede neural profunda (DNN). Esses modelos serão comparados com o modelo de aprendizado federado, permitindo uma análise detalhada das métricas obtidas, como acurácia, precisão, sensibilidade, F1-score e o tempo de processamento. A comparação entre os modelos visa identificar as vantagens e limitações de cada abordagem, destacando o impacto do aprendizado federado na preservação de privacidade dos dados e na eficiência do treinamento distribuído.
 
 \section{Análise dos Resultados}
 \label{sec:resultados}
@@ -13,7 +13,7 @@ Serão apresentados e discutidos os desempenhos dos modelos desenvolvidos ao lon
 
 \subsection{Modelo Centralizado - Rede neural convolucional}
 
-Um dos modelos centralizados foi implementado utilizando uma rede neural convolucional (CNN) e treinado sobre o conjunto de dados MNIST. Este modelo foi configurado para realizar cinco épocas de treinamento, com um tamanho de lote de 32, utilizando o otimizador Adam e a função de perda \texttt{sparse\_categorical\_crossentropy}. Durante o processo, as métricas de acurácia e perda foram acompanhadas tanto no conjunto de treinamento quanto no de validação, permitindo uma análise detalhada do comportamento do modelo ao longo das épocas.
+Um dos modelos centralizados foi implementado utilizando uma rede neural convolucional (CNN) e treinado sobre o conjunto de dados Fashion-MNIST. O modelo foi desenhado com duas camadas convolucionais seguidas de camadas de pooling, aplicando a técnica de dropout para evitar o overfitting. O modelo foi treinado com 50 épocas, utilizando a otimização Adam, com uma taxa de aprendizado ajustada para 0,001 para garantir um aprendizado gradual. O objetivo foi avaliar o desempenho de um modelo CNN simples, mas com regularização, em um conjunto de dados com complexidade visual moderada, como o Fashion-MNIST.
 
 \begin{figure}[ht]
     \centering
@@ -23,7 +23,7 @@ Um dos modelos centralizados foi implementado utilizando uma rede neural convolu
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-Os resultados obtidos indicam um desempenho satisfatório do modelo centralizado. A acurácia no conjunto de teste alcançou 99,03\%, com uma perda de 0,0302, o que evidencia a capacidade do modelo de generalizar para dados não vistos. Além disso, o tempo total de treinamento foi de 337,32 segundos (aproximadamente 5 minutos e 37 segundos), o que demonstra uma eficiência razoável, dada a complexidade do modelo e o tamanho do conjunto de dados.
+Durante o treinamento, como observado na Figura \ref{fig:acuracyCNN}, o modelo apresentou uma curva de aprendizado consistente, com acurácia de treino subindo de 72,57\% na primeira época para cerca de 96,71\% na última época. Já nos dados de teste, a acurácia se estabilizou em torno de 91,40\%. Esses resultados mostram que o modelo CNN consegue generalizar bem para os dados de teste, sem apresentar sinais claros de overfitting, apesar de ter utilizado dropout para regularização. Isso é evidenciado também pelo comportamento da perda, que foi reduzida de 0,7628 na primeira época para 0,0811 na última.
 
 \begin{figure}[ht]
     \centering
@@ -33,11 +33,15 @@ Os resultados obtidos indicam um desempenho satisfatório do modelo centralizado
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-Durante o treinamento, observou-se uma melhoria constante na acurácia, tanto no conjunto de treinamento quanto no de validação, atingindo valores próximos de 99\% já na segunda época. Essa tendência continuou ao longo das épocas subsequentes, com uma pequena oscilação nos valores de perda, mas sem indícios de \textit{overfitting}, dado que as curvas de acurácia e perda de validação acompanharam de perto as de treinamento.
+A análise das métricas de validação mostra que o modelo atingiu 91,33\% de acurácia nos dados de teste (\ref{fig:lossCNN}). A perda de validação, embora tenha flutuado ao longo das épocas, manteve-se em níveis aceitáveis, finalizando em 0,4632. A validação revelou que o modelo manteve uma consistência de generalização ao longo do treinamento, mas a perda levemente elevada no final das épocas indica que ainda há espaço para melhorias na otimização do modelo, ou ajustes adicionais para regularização mais eficiente.
+
+Em termos de tempo de treinamento, o modelo foi treinado por aproximadamente 3816 segundos (cerca de 63 minutos), o que reflete a complexidade do modelo CNN em comparação com arquiteturas mais simples como MLP. Apesar desse tempo considerável, os resultados sugerem que o esforço computacional é justificado pelo ganho de desempenho, especialmente na tarefa de classificação de imagens mais complexas, como as da base Fashion-MNIST. Comparando com o modelo federado, a principal vantagem aqui está no tempo de treinamento, uma vez que a centralização dos dados acelera significativamente o processo, eliminando a latência e a complexidade da comunicação entre dispositivos, que são características do aprendizado federado.
 
 \subsection{Modelo Centralizado - Rede neural multicamadas}
 
-O modelo centralizado apresentado nesta seção foi desenvolvido utilizando uma Rede Neural Multicamadas (MLP), composta por quatro camadas densas, das quais três utilizam a função de ativação ReLU e a camada de saída utiliza a função \textit{softmax} para classificação. O objetivo deste modelo é classificar as imagens da base de dados MNIST, que foram achatadas para uma dimensão de 28x28, correspondendo a 784 entradas para cada amostra.
+O modelo MLP foi construído com uma arquitetura composta por camadas densas totalmente conectadas, com três camadas ocultas contendo 512, 256 e 128 neurônios, respectivamente. Além disso, foi implementado um mecanismo de regularização através de dropout, que visa reduzir o overfitting ao desativar uma fração de neurônios durante o treinamento. A função de ativação utilizada foi a ReLU, com a camada final sendo uma softmax, apropriada para classificação multiclasse.
+
+Durante o treinamento, que ocorreu ao longo de 50 épocas, o modelo mostrou uma melhoria gradual em termos de acurácia, partindo de 73,37\% na primeira época e atingindo 91,02\% ao final. A precisão nos dados de teste alcançou 89,09\%, o que reflete a capacidade do modelo de generalizar razoavelmente bem para dados não vistos (\ref{fig:acuracyMLP}). A perda de validação oscilou ao longo do processo de treinamento, com uma ligeira tendência de queda, indicando que o modelo estava efetivamente aprendendo, embora a diferença entre perda de treinamento e perda de validação sugira que um ajuste fino adicional poderia melhorar ainda mais o desempenho.
 
 \begin{figure}[ht]
     \centering
@@ -47,7 +51,7 @@ O modelo centralizado apresentado nesta seção foi desenvolvido utilizando uma 
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-Após o treinamento do modelo por 5 épocas, com um tamanho de \textit{batch} de 32, foi possível observar um desempenho consistente. A acurácia de treinamento evoluiu de 89,36\% na primeira época para 98,88\% na quinta. Nos dados de validação, o modelo apresentou uma acurácia de 96,87\% já na primeira época, atingindo 97,67\% ao final do treinamento. Esse resultado demonstra a capacidade do MLP de generalizar bem para dados não vistos, o que se reflete no desempenho ao testar o modelo com dados de teste, onde obteve uma acurácia de 97,34\%.
+Analisando as métricas obtidas, a acurácia se estabilizou em torno de 89\% nos dados de teste, sugerindo que o MLP foi capaz de capturar padrões relevantes para a tarefa de classificação de imagens da base de dados Fashion-MNIST. A regularização por dropout também desempenhou um papel fundamental na mitigação do overfitting, permitindo que o modelo mantivesse um bom desempenho ao lidar com dados de teste. No entanto, em comparação com outros modelos como a CNN, o MLP mostra-se ligeiramente inferior, especialmente em termos de generalização para novas amostras, o que é esperado, dado que a CNN é mais eficaz para capturar padrões espaciais em dados de imagem.
 
 \begin{figure}[ht]
     \centering
@@ -57,15 +61,11 @@ Após o treinamento do modelo por 5 épocas, com um tamanho de \textit{batch} de
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-Em termos de perda, o modelo começou com um valor de 0,3457 na primeira época, reduzindo para 0,0346 na última, o que indica uma boa otimização do erro durante o treinamento. A perda nos dados de validação seguiu uma trajetória estável, permanecendo em torno de 0,0856 ao final do processo, sugerindo que o modelo conseguiu evitar o \textit{overfitting}, uma vez que as métricas de validação e treinamento se mantiveram próximas.
-
-O tempo total de treinamento foi de aproximadamente 114 segundos, o que representa um tempo relativamente rápido para o conjunto de dados MNIST, considerando a arquitetura utilizada. Esse desempenho do MLP indica que redes densas profundas podem ser eficazes na resolução de problemas de classificação de imagens simples como o MNIST, mas também evidencia a necessidade de modelos mais avançados para melhorar ainda mais a precisão e o tempo de treinamento, comparando, por exemplo, com redes convolucionais (CNNs).
+Em termos de tempo de treinamento, o MLP foi significativamente mais rápido do que a CNN, completando o treinamento em aproximadamente 22 minutos (1348 segundos). Embora esse modelo tenha se mostrado eficiente em termos de tempo, a compensação foi uma precisão ligeiramente inferior e uma maior suscetibilidade ao overfitting. Isso reflete uma característica comum dos MLPs em comparação com arquiteturas mais complexas, como as CNNs, que conseguem captar melhor as relações espaciais intrínsecas aos dados de imagem.
 
 \subsection{Modelo Centralizado - Rede neural profunda}
 
-Nesta seção, é analisado o desempenho de um modelo centralizado desenvolvido utilizando uma Rede Neural Profunda (DNN). O modelo foi composto por cinco camadas densas, sendo quatro com a função de ativação ReLU e uma camada de saída com a função \textit{softmax}, projetada para realizar a classificação das imagens da base de dados MNIST.
-
-Durante o treinamento, que foi realizado em 5 épocas com um tamanho de \textit{batch} de 32, o modelo apresentou uma acurácia de 89,85\% já na primeira época, chegando a 98,75\% ao final. A acurácia de validação também foi expressiva, alcançando 95,52\% na primeira época e 97,60\% na última. Esses resultados demonstram uma boa capacidade de generalização do modelo, mesmo ao trabalhar com dados não vistos.
+O modelo foi composto por uma camada de entrada que recebe as imagens de 28x28, que são achatadas para vetores, seguida por múltiplas camadas densas, começando com 1024 neurônios, reduzindo gradativamente para 512, 256 e 128 neurônios. Além disso, foi implementada uma técnica de dropout de 50\% após a primeira camada densa, visando reduzir o overfitting. As camadas ocultas utilizam a função de ativação ReLU e a camada final utiliza softmax, apropriada para classificação multiclasse.
 
 \begin{figure}[ht]
     \centering
@@ -75,7 +75,7 @@ Durante o treinamento, que foi realizado em 5 épocas com um tamanho de \textit{
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-A análise da perda durante o treinamento e validação reflete uma trajetória semelhante. Inicialmente, o modelo apresentou uma perda de 0,3233, que foi reduzida para 0,0404 ao final do processo de treinamento. Nos dados de validação, a perda começou em 0,1489 e chegou a 0,0975, sugerindo que o modelo conseguiu manter um bom equilíbrio entre a minimização do erro e a generalização, sem indícios de \textit{overfitting} significativos.
+Durante o treinamento, que ocorreu ao longo de 50 épocas, observamos uma evolução gradual da acurácia. Na primeira época, o modelo atingiu uma acurácia de 73,94\%, e ao final do treinamento, a acurácia nos dados de teste alcançou 89,69\% (Figura \ref{fig:acuracyDNN}). O modelo demonstrou boa capacidade de generalização para os dados de teste, indicando que foi capaz de captar os padrões das imagens de roupas e calçados presentes na base Fashion-MNIST. A perda de validação também apresentou uma tendência de queda ao longo do treinamento, apesar de ter flutuado um pouco após a 30ª época, sugerindo um leve overfitting que pode ser melhorado com ajustes de hiperparâmetros ou técnicas de regularização mais avançadas, como pode ser observado na Figura \ref{fig:lossDNN}.
 
 \begin{figure}[ht]
     \centering
@@ -85,15 +85,15 @@ A análise da perda durante o treinamento e validação reflete uma trajetória 
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-Ao testar o modelo com dados de teste, a acurácia obtida foi de 97,30\%, o que demonstra uma consistência com os resultados de validação. O tempo total de treinamento foi de aproximadamente 318 segundos, um aumento considerável em relação ao modelo MLP, o que reflete a maior complexidade e o número de parâmetros do DNN.
-
-Esse desempenho destaca o potencial do DNN em tarefas de classificação mais complexas, como a classificação de imagens, quando comparado a modelos mais simples. A análise comparativa com outros modelos centralizados, como a CNN e a MLP, será realizada para avaliar a relação entre o tempo de processamento e a precisão obtida.
+Em termos de tempo de treinamento, o modelo DNN exigiu aproximadamente 64 minutos (3856 segundos) para ser treinado, o que reflete a complexidade da arquitetura e o tempo necessário para ajustar os parâmetros com uma taxa de aprendizado reduzida para melhorar a convergência. Comparando com os modelos mais simples como o MLP, o DNN obteve um desempenho de acurácia superior, devido à sua maior capacidade de representação e número de parâmetros. No entanto, em termos de tempo, o DNN foi mais lento que os outros modelos centralizados, o que era esperado, dada a profundidade da rede e o número de camadas e neurônios envolvidos.
 
 \section{Resultados do Modelo Federado}
 
-Nesta seção, é analisado o desempenho de um modelo federado utilizando a abordagem de aprendizado federado com o algoritmo de \textit{FedAvg}. O modelo foi projetado com uma arquitetura de rede neural convolucional (CNN) para classificar as imagens da base de dados MNIST. O treinamento federado foi realizado por 10 rodadas, distribuindo os dados entre 10 clientes, utilizando as métricas de acurácia categórica esparsa e acurácia \textit{Top-3}.
+O modelo federado criado para este projeto foi projetado para treinar uma Rede Neural Convolucional (CNN) em um cenário distribuído utilizando dados descentralizados da base Fashion-MNIST. A CNN possui duas camadas convolucionais seguidas de pooling, uma camada totalmente conectada de 128 neurônios e, por fim, uma camada de saída com softmax para as 10 classes do conjunto de dados. A arquitetura foi escolhida para equilibrar a complexidade com o desempenho, enquanto a estratégia federada permitiu o treinamento local em múltiplos clientes sem centralizar os dados. As métricas analisadas incluem acurácia, acurácia top-3 e perda ao longo de 20 rodadas de treinamento.
 
 \subsection{Acurácia por Rodada}
+
+A acurácia categórica medida ao longo das rodadas indica a porcentagem de previsões corretas do modelo considerando apenas a classe mais provável. Na primeira rodada, a acurácia inicial foi de 71,58\%, o que já era uma base sólida considerando o treinamento distribuído e a variedade dos dados em diferentes dispositivos. À medida que o treinamento avançou, a acurácia foi aumentando, chegando a 91,62\% na vigésima rodada. A expectativa era que o modelo federado convergisse para uma acurácia próxima à obtida por um modelo centralizado, mas com desafios como a variabilidade nos dados de diferentes clientes. A acurácia por rodada é apresentada na Figura \ref{fig:acuracyFederated}.
 
 \begin{figure}[ht]
     \centering
@@ -103,9 +103,17 @@ Nesta seção, é analisado o desempenho de um modelo federado utilizando a abor
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-O gráfico de acurácia mostra uma evolução constante ao longo das rodadas. Na primeira rodada, o modelo federado obteve uma acurácia de aproximadamente \textbf{92,57\%}. Já na décima rodada, o modelo alcançou uma acurácia de \textbf{99,68\%}, indicando que o modelo aprendeu de forma eficaz ao longo do processo federado, conseguindo generalizar bem mesmo com os dados distribuídos.
+A melhoria constante ao longo das rodadas demonstra que, apesar das limitações inerentes ao aprendizado federado, a rede neural conseguiu aprender de maneira eficiente. Entretanto, ajustes finos, como a otimização dos parâmetros e o balanceamento dos dados entre os clientes, poderiam ainda mais aprimorar o desempenho.
 
 \subsection{Acurácia \textit{Top-3}}
+
+A utilização da métrica de acurácia top-3 em um modelo simples, que à primeira vista não parece exigir tal métrica, pode gerar questionamentos. No entanto, há uma justificativa técnica e prática para trazê-la ao contexto de modelos de aprendizado federado, mesmo em cenários menos complexos. A acurácia tradicional, ou top-1, avalia se a previsão feita pelo modelo corresponde exatamente à classe correta. Já a acurácia top-3 expande essa perspectiva, permitindo que a previsão correta seja considerada válida se estiver entre as três principais respostas dadas pelo modelo.
+
+Por que então aplicar a acurácia top-3 em um modelo simples? A resposta está na capacidade dessa métrica de fornecer uma visão mais abrangente da capacidade do modelo em capturar relações próximas entre classes. Quando o modelo lida com dados que possuem classes muito similares entre si – como imagens no conjunto de dados CIFAR-10 ou MNIST – pode ser difícil determinar com precisão se um objeto pertence a uma classe específica, especialmente em casos onde diferentes classes compartilham características visuais ou padrões complexos. Assim, a acurácia top-3 ajuda a revelar se o modelo está, de fato, fazendo previsões significativas, mesmo que a primeira escolha não seja exatamente correta.
+
+Em um cenário real, como em uma aplicação de reconhecimento de imagem em smartphones, o dispositivo pode estar treinando com imagens locais que variam significativamente das imagens em outros dispositivos. A acurácia top-3 se torna útil aqui porque permite observar se o modelo está, ao menos, identificando as classes mais próximas de forma coerente, mesmo que em alguns casos não acerte exatamente a classe correta no top-1. Isso é especialmente importante quando há variações nos dados ou ruído nas entradas.
+
+A acurácia top-3 reflete a capacidade do modelo de incluir a classe correta entre as três principais previsões feitas. Esta métrica é particularmente útil em cenários onde a classificação pode ter ambiguidade e uma das classes mais prováveis pode ser a correta. No modelo federado, a acurácia top-3 começou em 93,95\% e subiu para 99,50\% na rodada final. A acurácia top-3 é apresentada na Figura \ref{fig:acuracyTop3Federated}.
 
 \begin{figure}[ht]
     \centering
@@ -115,9 +123,11 @@ O gráfico de acurácia mostra uma evolução constante ao longo das rodadas. Na
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-A acurácia \textit{Top-3}, que mede se a classe correta está entre as três previsões com maior probabilidade, começou com \textbf{98,35\%} na primeira rodada e atingiu \textbf{99,99\%} na última rodada. Isso demonstra que o modelo foi altamente eficiente ao classificar as imagens, mantendo uma alta probabilidade de acerto nas três primeiras previsões.
+Esse resultado sugere que o modelo federado pode ser particularmente eficaz em cenários onde a precisão absoluta de top-1 pode não ser suficiente, como em recomendações de produtos ou sistemas de detecção com baixa margem de erro.
 
 \subsection{Perda por Rodada}
+
+A perda foi monitorada como uma métrica que quantifica o erro do modelo, sendo uma medida crítica durante o processo de otimização. Na primeira rodada, a perda era relativamente alta, com um valor de 0,773, o que reflete a incerteza inicial do modelo ao fazer previsões em um cenário federado. Ao longo do treinamento, houve uma queda consistente na perda, que foi reduzida para 0,227 ao final da vigésima rodada. A perda por rodada é apresentada na Figura \ref{fig:lossFederated}.
 
 \begin{figure}[ht]
     \centering
@@ -127,19 +137,15 @@ A acurácia \textit{Top-3}, que mede se a classe correta está entre as três pr
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-A perda no treinamento também apresentou uma redução significativa ao longo das rodadas. Iniciando com uma perda de \textbf{0,259} na primeira rodada, a perda caiu para \textbf{0,013} na décima rodada, indicando que o modelo conseguiu minimizar o erro de classificação conforme o treinamento avançou.
-
-\subsection{Tempo de Treinamento}
-
-O tempo total de treinamento federado foi de \textbf{4314 segundos} (aproximadamente \textbf{1 hora e 12 minutos}). Esse tempo reflete o processo de agregação e distribuição das atualizações entre os clientes e o servidor, o que é típico em ambientes de aprendizado federado, especialmente ao utilizar um grande número de clientes e iterações.
+A expectativa era de que a perda diminuísse à medida que o modelo ajustasse seus pesos com base nas atualizações federadas, embora a velocidade da convergência possa ser impactada pela comunicação entre os dispositivos e a distribuição não homogênea dos dados. A redução da perda confirma que o modelo aprendeu de maneira estável ao longo das rodadas, e, embora o treinamento federado tenha suas complexidades, ele foi capaz de atingir um desempenho competitivo com modelos centralizados.
 
 \section{Desempenho entre os Modelos}
 
-Nesta seção, analisamos o desempenho dos modelos centralizados e federados aplicados ao conjunto de dados MNIST. As métricas de avaliação utilizadas incluem acurácia, acurácia \textit{Top-3} e perda. A comparação entre o modelo de aprendizado federado e os modelos centralizados oferece insights valiosos sobre a eficácia e a eficiência das diferentes abordagens.
+Nesta seção, analisamos o desempenho dos modelos centralizados e federados aplicados ao conjunto de dados Fashion-MNIST. As métricas de avaliação utilizadas incluem acurácia, acurácia \textit{Top-3} e perda. A comparação entre o modelo de aprendizado federado e os modelos centralizados oferece insights valiosos sobre a eficácia e a eficiência das diferentes abordagens.
 
 \subsection{Acurácia}
 
-A acurácia é uma métrica fundamental que indica a proporção de previsões corretas feitas pelo modelo em relação ao total de previsões. Para o modelo centralizado de MLP, a acurácia de teste alcançou \textbf{97,67\%}, enquanto o modelo DNN obteve \textbf{97,60\%}. Esses resultados demonstram que ambos os modelos centralizados foram eficazes na classificação das imagens da base MNIST, com o MLP apresentando uma ligeira vantagem.
+A acurácia é a principal métrica usada para avaliar a proporção de previsões corretas feitas pelo modelo em relação ao total de previsões. Nos modelos centralizados desenvolvidos com diferentes técnicas de treinamento (CNN, MLP, DNN), a acurácia foi consistentemente alta, com a CNN alcançando uma acurácia de 91,4\% após 50 épocas de treinamento, o MLP atingindo 89,0\%, e o DNN registrando 89,6\%. Esses números refletem um desempenho sólido, especialmente considerando o uso de um conjunto de dados como o Fashion-MNIST. O modelo federado, por outro lado, apresentou uma acurácia final de 91,6\% após 20 rodadas de treinamento, o que está alinhado com as expectativas de desempenho. A comparação da acurácia dos modelos Centralizados e Federado é apresentada na Figura \ref{fig:acuracyComparison}.
 
 \begin{figure}[ht]
     \centering
@@ -149,17 +155,11 @@ A acurácia é uma métrica fundamental que indica a proporção de previsões c
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-Por outro lado, o modelo federado, após 10 rodadas de treinamento, alcançou uma acurácia impressionante de \textbf{99,68\%}. Este resultado não apenas supera os modelos centralizados, mas também indica uma excelente capacidade de generalização do modelo federado, mesmo com os dados distribuídos entre múltiplos clientes. A expectativa pré-treinamento era de que o modelo federado pudesse oferecer desempenho competitivo, mas a acurácia obtida ultrapassou as expectativas, sugerindo que o aprendizado federado é uma abordagem viável e eficiente para preservação da privacidade sem comprometer a precisão do modelo.
-
-\subsection{Acurácia \textit{Top-3}}
-
-A acurácia \textit{Top-3} é uma métrica adicional que mede a proporção de vezes em que a classe correta está entre as três principais previsões do modelo. Essa métrica é particularmente útil para avaliar a confiabilidade do modelo em cenários onde uma única previsão pode não ser suficiente. No treinamento centralizado, a acurácia \textit{Top-3} não foi diretamente medida para os modelos MLP e DNN. No entanto, para o modelo federado, a acurácia \textit{Top-3} começou em \textbf{98,35\%} e atingiu \textbf{99,99\%} após 10 rodadas.
-
-Este desempenho notável do modelo federado na métrica \textit{Top-3} reforça a sua eficácia não apenas em fazer previsões corretas, mas também em fornecer previsões confiáveis entre as três opções mais prováveis. A melhoria constante observada ao longo das rodadas de treinamento sugere que o modelo federado consegue refinar suas previsões de forma eficiente, mesmo em um ambiente descentralizado. Isso é um indicativo de que o modelo é robusto e confiável, mantendo uma alta probabilidade de incluir a resposta correta nas suas três principais previsões.
+Esperava-se que o modelo federado atingisse níveis comparáveis aos modelos centralizados, apesar das limitações inerentes à descentralização dos dados e à variação entre os dispositivos. De maneira geral, a acurácia do modelo federado mostrou-se competitiva, evidenciando que a abordagem distribuída pode ser eficaz em cenários reais sem sacrificar significativamente a precisão.
 
 \subsection{Perda}
 
-A perda é uma métrica que quantifica a discrepância entre as previsões do modelo e os valores reais, representando a eficácia do modelo em minimizar erros durante o treinamento. Para o modelo MLP, a perda de teste foi de \textbf{0,1013}, e para o modelo DNN foi de \textbf{0,1101}. Ambos os modelos centralizados mostraram desempenhos bastante similares em termos de perda, com o MLP ligeiramente superior.
+A perda é uma métrica que reflete o erro acumulado do modelo ao longo do treinamento. Em modelos de classificação como os utilizados neste estudo, a perda é geralmente expressa através da função de erro de entropia cruzada. Para os modelos centralizados, a perda final foi de 0,48 para a CNN, 0,31 para o MLP e 0,33 para o DNN, indicando que o erro foi bem minimizado ao longo do processo de treinamento. O modelo federado, por sua vez, apresentou uma perda de 0,23 na última rodada, sugerindo que ele foi capaz de reduzir o erro de maneira eficiente, mesmo em um cenário onde os dados estão distribuídos e não centralizados. Como pode ser observado na Figura \ref{fig:lossComparison}.
 
 \begin{figure}[ht]
     \centering
@@ -169,11 +169,19 @@ A perda é uma métrica que quantifica a discrepância entre as previsões do mo
     \fonte{Elaborado pelo autor.}
 \end{figure}
 
-O modelo federado, por sua vez, iniciou com uma perda de \textbf{0,259} na primeira rodada e conseguiu reduzir essa métrica para \textbf{0,013} ao final das 10 rodadas. A significativa redução na perda ao longo do treinamento federado demonstra que o modelo federado foi capaz de aprender e ajustar seus parâmetros de forma eficaz, minimizando os erros de classificação. Essa tendência de diminuição da perda indica que o modelo federado não apenas tem uma acurácia alta, mas também é eficaz em ajustar suas previsões para se alinhar mais de perto com os valores reais, o que é um resultado positivo considerando o cenário de aprendizado distribuído.
+Antes do treinamento, a expectativa era de que a perda no modelo federado fosse ligeiramente maior do que nos modelos centralizados, devido à complexidade adicional introduzida pela comunicação entre dispositivos e pelas diferenças nos dados locais. No entanto, o resultado final foi positivo, com a perda do modelo federado sendo inferior em algumas rodadas, o que indica que o processo federado conseguiu aprender de forma eficiente, mesmo com as restrições do ambiente distribuído.
+
+\subsection{Acurácia \textit{Top-3}}
+
+A acurácia top-3 mede a capacidade do modelo de prever a classe correta dentro das três classes mais prováveis, o que é especialmente útil em cenários onde há ambiguidades entre classes. Para os modelos centralizados, essa métrica não foi usada inicialmente, mas foi incluída no modelo federado como uma forma de explorar cenários mais realistas de classificação. A acurácia top-3 do modelo federado atingiu 99,5\% na última rodada, o que significa que, mesmo em casos onde o modelo não acertou a classe exata, ele foi capaz de incluir a resposta correta entre suas três principais previsões na maioria das vezes.
+
+Isso era esperado, uma vez que a acurácia top-3 geralmente tende a ser mais alta do que a acurácia categórica, dado que o modelo tem mais chances de acertar dentro de um intervalo maior de possibilidades.  A alta acurácia top-3 no modelo federado sugere que ele poderia ser altamente eficaz em cenários de produção, onde a precisão absoluta nem sempre é o critério mais importante.
 
 \section{Considerações Finais}
 
-A comparação entre o modelo federado e os modelos centralizados revela que o aprendizado federado pode alcançar, e até superar, o desempenho dos modelos centralizados em termos de acurácia, acurácia \textit{Top-3} e perda. As expectativas pré-treinamento de que o modelo federado poderia oferecer desempenho competitivo foram confirmadas e, em muitos aspectos, superadas. Esses resultados demonstram que o aprendizado federado é uma abordagem poderosa e eficiente para treinamento de modelos de IA, permitindo a preservação da privacidade dos dados sem sacrificar a precisão e a eficácia do modelo. A análise detalhada das métricas reforça a viabilidade e a vantagem do aprendizado federado em ambientes onde a privacidade dos dados é crucial.
+Comparando o desempenho geral dos modelos, pode-se observar que o modelo federado apresentou desempenho semelhante, e em alguns casos, até superior em relação aos modelos centralizados em termos de acurácia e perda. A principal vantagem do aprendizado federado é a preservação da privacidade dos dados, mas isso geralmente vem com o custo de maior complexidade no treinamento e maiores exigências computacionais. No entanto, os resultados demonstram que, com as devidas otimizações, o aprendizado federado pode atingir níveis de desempenho muito próximos dos modelos tradicionais centralizados, sem comprometer significativamente a precisão ou aumentar excessivamente a perda. A inclusão da acurácia top-3 também destaca o potencial do aprendizado federado para ser utilizado em cenários de classificação mais complexos, onde várias respostas podem ser válidas.
+
+Em termos de expectativas, esperava-se que os modelos centralizados se saíssem um pouco melhor em acurácia e perda, devido à sua simplicidade e eficiência computacional, mas os resultados mostraram que o modelo federado foi capaz de se manter competitivo. Essa conclusão reforça a ideia de que o aprendizado federado é uma solução viável para cenários descentralizados, onde a privacidade é uma preocupação central, sem sacrificar o desempenho.
 
 \section{Dificuldades e Limitações}
 
@@ -185,13 +193,11 @@ Desenvolver modelos de aprendizado centralizado e federado envolveu uma série d
 
 \subsection{Influência na Escolha da Base de Dados}
 
-A escolha da base de dados MNIST foi fortemente influenciada pelas limitações e dificuldades enfrentadas. MNIST é uma base de dados relativamente simples e bem compreendida, o que a torna ideal para testar e validar conceitos iniciais de aprendizado de máquina e federado. A simplicidade do MNIST permite a implementação e o ajuste dos modelos sem a complexidade adicional que outras bases de dados mais desafiadoras poderiam introduzir. O uso de MNIST facilitou a identificação de problemas e a realização de ajustes nos modelos, sem o impacto adicional das complexidades associadas a bases de dados mais sofisticadas.
-
-No entanto, a simplicidade do MNIST também significa que as dificuldades enfrentadas no desenvolvimento dos modelos podem não refletir os desafios encontrados em cenários mais complexos e realistas. Modelos treinados com MNIST podem não se comportar da mesma forma quando aplicados a bases de dados mais complexas ou em cenários reais de aprendizado federado, onde a heterogeneidade dos dados e a comunicação entre clientes podem ser mais desafiadoras.
+A escolha da base de dados Fashion-MNIST foi feita de forma estratégica, levando em consideração a necessidade de um dataset que representasse um cenário de classificação realista, mas que ainda fosse manejável em termos computacionais. Fashion-MNIST apresenta um desafio maior do que o MNIST tradicional, mas ainda assim é uma base de dados controlada e de tamanho razoável, o que facilitou a comparação de resultados entre os diferentes modelos. No entanto, apesar da simplicidade relativa dos dados, a diversidade das imagens de vestuário e as pequenas diferenças entre classes exigiram que os modelos fossem cuidadosamente ajustados para maximizar a precisão sem sobrecarregar os recursos computacionais disponíveis.
 
 \subsection{Impacto do Google Colab no Treinamento dos Modelos}
 
-O uso do Google Colab teve um impacto significativo no desenvolvimento e no treinamento dos modelos. Google Colab fornece uma plataforma acessível e com recursos computacionais relativamente poderosos, como GPUs, o que facilitou o treinamento dos modelos, especialmente para o modelo DNN que exige maior capacidade computacional. No entanto, existem limitações associadas ao uso de Google Colab, como restrições de tempo de execução e limitações de memória. Essas restrições podem impactar o treinamento de modelos mais complexos ou o uso de grandes conjuntos de dados.
+O uso do Google Colab teve um impacto no desenvolvimento e no treinamento dos modelos. Google Colab fornece uma plataforma acessível e com recursos computacionais relativamente poderosos, como GPUs, o que facilitou o treinamento dos modelos, especialmente para o modelo DNN que exige maior capacidade computacional. No entanto, existem limitações associadas ao uso de Google Colab, como restrições de tempo de execução e limitações de memória. Essas restrições podem impactar o treinamento de modelos mais complexos ou o uso de grandes conjuntos de dados.
 
 \subsection{Limitações dos Métodos de Treinamento}
 
